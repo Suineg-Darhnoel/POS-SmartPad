@@ -6,6 +6,7 @@ class PosNgram():
 
     def __init__(self, context="", ngram=1):
         self.ngram = ngram
+
         # normalizing the context is very important!!
         self.__sentence = context.lower()
 
@@ -45,24 +46,6 @@ class PosNgram():
             else:
                 yield tuple(poses)
 
-    def phi2(self, word, include_token=False):
-        """
-        This function is important for computing a term weight
-        from POS n-grams, because it maps a term to all the POS
-        n-grams that 'contain' it.
-        """
-        for tples in self.tuples_of_token_pos(word):
-            tmp_tokens, tmp_poses = [], []
-
-            for token, pos in tples:
-                tmp_tokens.append(token)
-                tmp_poses.append(pos)
-
-            if include_token:
-                yield (tuple(tmp_tokens), tuple(tmp_poses))
-            else:
-                yield tuple(tmp_poses)
-
     @property
     # create a list of token with its POS
     def __tokens_pos(self):
@@ -70,12 +53,38 @@ class PosNgram():
         tokens = word_tokenize(sent)
         return pos_tag(tokens)
 
+def terms2poses(terms, ngram_dict):
+    pass
 
-def ngram_probs(poses):
-    elem_nums = len(poses)
 
-    for token, freq in poses.items():
-        yield (token, freq / elem_nums)
+def freq_count(filename, ngram=1, size=None):
+    ngram_dict = FreqDist()
+
+    with open(filename, encoding="utf-8", errors="ignore") as fptr:
+        lines = fptr.readlines(size)
+
+    for line in lines:
+        model = PosNgram(line, ngram)
+
+        # Counting
+        ngram_dict += FreqDist(model.phi1())
+
+    return ngram_dict
+
+
+def predict_next_words(ngram_sent, ngram_prob, word_nums=1):
+    next_words = []
+    return new_words
+
+
+def freq_count2prob(ngram_dict):
+    total_tokens = len(ngram_dict)
+
+    new_dict = {
+        token: freq / total_tokens
+        for token, freq in ngram_dict.items()
+    }
+    return new_dict
 
 
 def argmax_pos(poses):
@@ -91,18 +100,14 @@ def argmax_pos(poses):
 if __name__ == '__main__':
     # testing
 
-    with open("conversation_sample.txt", errors='ignore') as fptr:
-        lines = fptr.readlines()
+    filename = "conversation_sample.txt"
+    # filename = "gutenberg.txt"; size = 10**5
 
-    ngram_dict1 = FreqDist()
-    for line in lines:
-        ngram_model1 = PosNgram(line, 2)
+    u_freq = freq_count(filename)
+    u_prob = freq_count2prob(u_freq)
 
-        # start counting
-        ngram_dict1 += FreqDist(
-                    ngram_model1.phi2("have", include_token=False)
-                )
+    b_freq = freq_count(filename, 2)
+    b_prob = freq_count2prob(b_freq)
 
-    for elem in ngram_dict1.items():
-        print(elem)
-    print(len(ngram_dict1))
+    t_freq = freq_count(filename, 2)
+    t_prob = freq_count2prob(t_freq)
