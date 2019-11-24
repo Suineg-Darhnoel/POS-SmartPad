@@ -37,7 +37,7 @@ class Notepad:
         except KeyError:
             pass
 
-        # WINDOW
+        # WINDOW -------------------------------
 
         # Set the window text
         self.__root.title(self.__title)
@@ -57,7 +57,7 @@ class Notepad:
                 % (self.__thisWidth,
                    self.__thisHeight, left, top))
 
-        # MENU
+        # MENU -------------------------------
 
         # To open new file
         self.__thisFileMenu.add_command(
@@ -109,13 +109,13 @@ class Notepad:
 
         self.__root.config(menu=self.__thisMenuBar)
 
-        # SCROLLBAR
+        # SCROLLBAR -------------------------------
 
         # Scrollbar will adjust automatically according to the content
         self.__thisScrollBar.pack(side=RIGHT, fill=Y)
         self.__thisScrollBar.config(command=self.__thisTextArea.yview)
 
-        # TEXTAREA
+        # TEXTAREA -------------------------------
 
         # To make the textarea auto resizable
         self.__root.grid_rowconfigure(0, weight=1)
@@ -156,9 +156,11 @@ class Notepad:
             self.saveFile
         )
 
+    # QUIT
     def quitApplication(self, event=None):
         self.__root.destroy()
 
+    # OPENFILE
     def openFile(self, event=None):
 
         self.__file = askopenfilename(
@@ -185,12 +187,14 @@ class Notepad:
             with open(self.__file, 'r') as file:
                 self.__thisTextArea.insert(1.0, file.read())
 
+    # NEWFILE
     def newFile(self, event=None):
 
         self.__root.title('Untitled - AutoS-Notepad')
         self.__file = None
         self.__thisTextArea.delete(1.0, END)
 
+    # SAVEFILE
     def saveFile(self, event=None):
 
         if self.__file == None:
