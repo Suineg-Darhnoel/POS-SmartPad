@@ -6,6 +6,7 @@ import os
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter.filedialog import *
+from testing import *
 
 class Notepad:
 
@@ -239,22 +240,17 @@ class Notepad:
         ' ', '.', '!', '?', '\n'
     ]
 
-    def last_three_words(self, sent):
-        last3words = re.split('[\t\s\r\n]', sent[:-1])
-        return last3words[-3:]
-
     def call_detection(self, event):
         key_typed = event.char
 
         if key_typed == ' ':
             text = self.__thisTextArea.get(-3.0, END)
-            print("after space: ", text)
+            # print("after space: ", text)
 
 
         if key_typed in self.__delimiters:
             typed_string = self.__thisTextArea.get(1.0, END)
-            last3words = self.last_three_words(typed_string)
-            print(last3words)
+            predict_pos_token(typed_string, u_model, b_model)
 
 
     def run(self):
@@ -263,5 +259,19 @@ class Notepad:
 
 
 # Run main application
-notepad = Notepad()
-notepad.run()
+if __name__ == '__main__':
+    from Predict import *
+    filename = "austen-emma.txt"
+    size=10**4 # just 1/8 of the whole file
+    # size = None
+
+    u_model = PosNgram(1)
+    b_model = PosNgram(2)
+    t_model = PosNgram(3)
+
+    u_model.freq_counts(filename, size)
+    b_model.freq_counts(filename, size)
+    t_model.freq_counts(filename, size)
+
+    notepad = Notepad()
+    notepad.run()

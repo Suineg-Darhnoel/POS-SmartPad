@@ -2,6 +2,7 @@ from math import inf
 from math import log
 from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
+import random
 
 
 class PosNgram():
@@ -13,9 +14,12 @@ class PosNgram():
         # storing tokens and frequency
         self.ngram_dict = FreqDist()
 
+        # to prevent from illegral argument
+        if ngram < 1:
+            self.ngram = 1
+
     def __phi1(
             self,
-            include_token=True
         ):
         """
         This function maps terms to POS
@@ -23,17 +27,15 @@ class PosNgram():
         for elems in self.__ngram_tokens_pos:
             poses = [elem[1] for elem in elems]
 
-            if include_token:
-                tokens = [elem[0] for elem in elems]
-                yield (tuple(tokens), tuple(poses))
-            else:
-                yield tuple(poses)
+            tokens = [elem[0] for elem in elems]
+            yield (tuple(tokens), tuple(poses))
 
     def phi2(
             self,
             terms,
             is_pos=True,
-            include_freq=False
+            include_values=False,
+            default_dict=None
         ):
         """
         This function maps terms to their
@@ -41,17 +43,28 @@ class PosNgram():
         It works as a search function
         looking for terms in the dictionary
         """
+        if default_dict is None:
+            default_dict = self.ngram_dict
+
         if is_pos:
-            for (tokens, poses), freq in self.ngram_dict.items():
-                if terms == poses[:self.ngram-1]:
+            for (tokens, poses), freq in default_dict.items():
+                if self.ngram > 1:
+                    tmp_poses = poses[:self.ngram-1]
+                else:
+                    tmp_poses = poses
+                if terms == tmp_poses:
                     yield (tokens, poses) if\
-                            not include_freq else\
+                            not include_values else\
                             ((tokens, poses), freq)
         else:
-            for (tokens, poses), freq in self.ngram_dict.items():
-                if terms == tokens[:self.ngram-1]:
+            for (tokens, poses), freq in default_dict.items():
+                if self.ngram > 1:
+                    tmp_tokens = tokens[:self.ngram-1]
+                else:
+                    tmp_tokens = tokens
+                if terms == tmp_tokens:
                     yield (tokens, poses) if\
-                            not include_freq else\
+                            not include_values else\
                             ((tokens, poses), freq)
 
     def freq_counts(
@@ -77,8 +90,9 @@ class PosNgram():
 
     def freq2prob(
             self,
-            include_token=False
+            include_token=True
         ):
+        # need to improve !!!!!!!!!
         ngram_probs = FreqDist()
 
         if include_token:
@@ -115,32 +129,15 @@ class PosNgram():
             self.ngram
         )
 
-    def show_info(self, mc=10, include_token=False):
+    def show_prob_info(self, mc=10, include_token=False):
         for elem in self.freq2prob(include_token).most_common(mc):
             print(elem)
 
-
-def predict_pos_token(
-        ngram_sent,
-        ngram_model1,
-        ngram_model2
-    ):
-    ngram_sent = ngram_sent.lower()
-    sent_token_pos = pos_tag(word_tokenize(ngram_sent))
-
-    sent_poses = tuple([pos for _, pos in sent_token_pos[-2:]])
-    print(sent_poses)
-
-    # interpolation
-    # p = exp(log(p1) + log(p2) + log(p3))
-
-
 if __name__ == '__main__':
-    import pickle
-
     # testing
     filename = "austen-emma.txt"
     size=10**4 # just 1/8 of the whole file
+    # size = None
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)
