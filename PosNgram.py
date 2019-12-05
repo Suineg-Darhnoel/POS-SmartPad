@@ -110,6 +110,25 @@ class PosNgram():
 
         return ngram_probs
 
+    def joint_freq(self, pos):
+        def is_similar(w1, w2):
+            w1 = list(w1)
+            w2 = list(w2)
+            assert len(w1) == len(w2)
+            for w in w1:
+                if w in w2:
+                    w2.remove(w)
+            if len(w2) == 0:
+                return True
+            return False
+
+        tmp_freq = 0
+        for (_, p), freq in self.ngram_data.items():
+            if is_similar(pos, p):
+                tmp_freq += 1
+
+        return tmp_freq
+
     @property
     def __token_pos_pairs(self):
         """
@@ -143,7 +162,7 @@ class PosNgram():
 if __name__ == '__main__':
     # testing
     filename = "austen-emma.txt"
-    size=10**5 # just 1/8 of the whole file
+    size=10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
