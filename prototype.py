@@ -6,7 +6,7 @@ import os
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter.filedialog import *
-from testing import *
+from Predict import *
 
 class Notepad:
 
@@ -243,10 +243,6 @@ class Notepad:
     def call_detection(self, event):
         key_typed = event.char
 
-        if key_typed == ' ':
-            text = self.__thisTextArea.get(-3.0, END)
-            # print("after space: ", text)
-
 
         if key_typed in self.__delimiters:
             typed_string = self.__thisTextArea.get(1.0, END)
@@ -260,7 +256,6 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    from Predict import *
     filename = "austen-emma.txt"
     size=10**4 # just 1/8 of the whole file
     # size = None

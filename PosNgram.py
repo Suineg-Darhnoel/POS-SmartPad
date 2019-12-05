@@ -1,4 +1,3 @@
-from math import inf
 from math import log
 from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
@@ -7,65 +6,62 @@ import random
 
 class PosNgram():
 
-    def __init__(self, ngram=1):
-        self.ngram = ngram
+    def __init__(self, deg=1):
+        self.degree = deg
         self.__sentence = ""
 
         # storing tokens and frequency
-        self.ngram_dict = FreqDist()
+        self.ngram_data = FreqDist()
 
         # to prevent from illegral argument
-        if ngram < 1:
-            self.ngram = 1
+        if deg < 1:
+            self.degree = 1
 
-    def __phi1(
+    def poses2tokens(
             self,
-        ):
-        """
-        This function maps terms to POS
-        """
-        for elems in self.__ngram_tokens_pos:
-            poses = [elem[1] for elem in elems]
-
-            tokens = [elem[0] for elem in elems]
-            yield (tuple(tokens), tuple(poses))
-
-    def phi2(
-            self,
-            terms,
-            is_pos=True,
-            include_values=False,
+            pos_terms,
+            include_freq=False,
             default_dict=None
         ):
         """
-        This function maps terms to their
-        correspoding pos or vice versa
-        It works as a search function
-        looking for terms in the dictionary
+        # The token_terms must be the element of ngram_model
+        # whose degree is 1 smaller than that of the current one.
         """
         if default_dict is None:
-            default_dict = self.ngram_dict
+            default_dict = self.ngram_data
 
-        if is_pos:
-            for (tokens, poses), freq in default_dict.items():
-                if self.ngram > 1:
-                    tmp_poses = poses[:self.ngram-1]
-                else:
-                    tmp_poses = poses
-                if terms == tmp_poses:
-                    yield (tokens, poses) if\
-                            not include_values else\
-                            ((tokens, poses), freq)
-        else:
-            for (tokens, poses), freq in default_dict.items():
-                if self.ngram > 1:
-                    tmp_tokens = tokens[:self.ngram-1]
-                else:
-                    tmp_tokens = tokens
-                if terms == tmp_tokens:
-                    yield (tokens, poses) if\
-                            not include_values else\
-                            ((tokens, poses), freq)
+        for (tokens, poses), freq in default_dict.items():
+            if self.degree > 1:
+                tmp_poses = poses[:self.degree-1]
+            else:
+                tmp_poses = poses
+            if pos_terms == tmp_poses:
+                yield tokens if\
+                        not include_freq\
+                        else (tokens, freq)
+
+    def tokens2poses(
+            self,
+            token_terms,
+            include_freq=False,
+            default_dict=None
+        ):
+        """
+        # The token_terms must be the element of ngram_model
+        # whose degree is 1 smaller than that of the current one.
+        """
+        if default_dict is None:
+            default_dict = self.ngram_data
+
+        for (tokens, poses), freq in default_dict.items():
+            if self.degree > 1:
+                tmp_tokens = tokens[:self.degree-1]
+            else:
+                tmp_tokens = tokens
+            if token_terms == tmp_tokens:
+                yield poses if\
+                        not include_freq\
+                        else (poses, freq)
 
     def freq_counts(
             self,
@@ -73,7 +69,7 @@ class PosNgram():
             size=None,
         ):
 
-        self.ngram_dict = FreqDist()
+        self.ngram_data = FreqDist()
         with open(
                 filename,
                 encoding="utf-8",
@@ -86,7 +82,7 @@ class PosNgram():
             self.__sentence = line.lower()
 
             # Counting Step
-            self.ngram_dict.update(self.__phi1())
+            self.ngram_data.update(self.__token_pos_pairs)
 
     def freq2prob(
             self,
@@ -96,27 +92,38 @@ class PosNgram():
         ngram_probs = FreqDist()
 
         if include_token:
-            for elem in self.ngram_dict:
+            for elem in self.ngram_data:
                 ngram_probs.update(
-                    {elem : self.ngram_dict.freq(elem)}
+                    {elem : self.ngram_data.freq(elem)}
                 )
         else:
-            new_ngram_dict = FreqDist()
-            for elem in self.ngram_dict:
-                new_ngram_dict.update(
+            new_ngram_data = FreqDist()
+            for elem in self.ngram_data:
+                new_ngram_data.update(
                     {elem[1]}
                 )
 
-            for elem in new_ngram_dict:
+            for elem in new_ngram_data:
                 ngram_probs.update(
-                    {elem:new_ngram_dict.freq(elem)}
+                    {elem : new_ngram_data.freq(elem)}
                 )
 
         return ngram_probs
 
     @property
-    # create a list of token with its POS
-    def __tokens_pos(self):
+    def __token_pos_pairs(self):
+        """
+        This function maps terms to POS
+        (The previous version's name was phi1)
+        """
+        for elems in self.__ngram_tokens_pos:
+            poses = [elem[1] for elem in elems]
+
+            tokens = [elem[0] for elem in elems]
+            yield (tuple(tokens), tuple(poses))
+
+    @property
+    def __sent2pos_tag(self):
         sent = self.__sentence.lower()
         tokens = word_tokenize(sent)
         return pos_tag(tokens)
@@ -125,8 +132,8 @@ class PosNgram():
     def __ngram_tokens_pos(self):
         # this returns the tuples of token pos pair
         return ngrams(
-            self.__tokens_pos,
-            self.ngram
+            self.__sent2pos_tag,
+            self.degree
         )
 
     def show_prob_info(self, mc=10, include_token=False):
@@ -136,7 +143,7 @@ class PosNgram():
 if __name__ == '__main__':
     # testing
     filename = "austen-emma.txt"
-    size=10**4 # just 1/8 of the whole file
+    size=10**5 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
