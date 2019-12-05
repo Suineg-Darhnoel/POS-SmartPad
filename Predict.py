@@ -2,7 +2,7 @@ from PosNgram import *
 
 def predict_pos_token(
         ngram_sent,
-        *ngram_models,
+        *ng_models,
         mc=3
     ):
 
@@ -18,60 +18,41 @@ def predict_pos_token(
 
     print(sent_poses)
 
-    if len(sent_poses) == 0:
-        # employ only unigram
-        print("You may try...")
+    if len(sent_poses) == 1:
+        print_info = "<{}> with {:.2f}% probability being right."
+        # bigram model
 
-        pos_prob = ngram_models[0].freq2prob().most_common(mc)
-        for pos, prob in pos_prob:
+        the_pos = tuple(sent_poses)
+        all_poses = ng_models[1].fetch_if_head(
+                the_pos, ng_models[0])
+        print(all_poses)
 
-            info = "{} with {:.2f}% probability being right."
-            print(info.format(pos[-1], prob*100))
+        next_pos_prob = FreqDist()
 
-            word_pos = ngram_models[0].phi2(pos[-1])
-            words = [
-                word for word, pos in word_pos
-            ]
-
-            random.shuffle(words)
-            print("For example: ", words[:3], end="\n\n")
-
-    elif len(sent_poses) == 1:
-        # employ unigram and bigram
-        freq2prob_data2 = ngram_models[1].freq2prob()
-        tp_prob = ngram_models[1].phi2(
-            sent_poses,
-            default_dict=freq2prob_data2,
-            include_values=True
-        )
-
-        pos_prob2 = FreqDist()
-        for (_, poses), prob in tp_prob:
-            pos_prob2.update({poses:prob})
+        for p in all_poses:
+            n = ng_models[1].joint_freq(p)
+            d = ng_models[0].joint_freq(p[:-1])
+            next_pos_prob.update({p[-1]:n/d})
 
         print("You may try...")
+        result = next_pos_prob.most_common(5)
+        print(result)
 
-        pos_prob2 = pos_prob2.most_common(3)
-        for pos, prob in pos_prob2:
+        for pos, prob in result:
 
-            info = "<{}> with {:.2f}% probability being right."
-            print(info.format(pos[-1], prob*100))
+            print(print_info.format(pos, prob*100))
 
-            word_pos = ngram_models[0].phi2((pos[-1],))
-            words = [
-                word for word, pos in word_pos
-            ]
-
-            random.shuffle(words)
-            print("For example: ", words[:3], end="\n\n")
+            # random.shuffle(words)
+            # print("For example: ", words[:3], end="\n\n")
     else:
+        # trigram model
         pass
 
 
 # start testing
 if __name__== "__main__":
     filename = "austen-emma.txt"
-    size=10**5 # just 1/8 of the whole file
+    size=10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
