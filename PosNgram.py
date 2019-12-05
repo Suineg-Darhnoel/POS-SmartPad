@@ -125,7 +125,7 @@ class PosNgram():
         tmp_freq = 0
         for (_, p), freq in self.ngram_data.items():
             if is_similar(pos, p):
-                tmp_freq += 1
+                tmp_freq += freq
 
         return tmp_freq
 
