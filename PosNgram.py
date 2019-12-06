@@ -1,7 +1,6 @@
 from math import log
 from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
-import random
 
 
 class PosNgram:
@@ -31,11 +30,7 @@ class PosNgram:
             default_dict = self.ngram_data
 
         for (tokens, poses), freq in default_dict.items():
-            if self.degree > 1:
-                tmp_poses = poses[:self.degree-1]
-            else:
-                tmp_poses = poses
-            if pos_terms == tmp_poses:
+            if pos_terms == poses:
                 yield tokens if\
                         not include_freq\
                         else (tokens, freq)
@@ -54,16 +49,12 @@ class PosNgram:
             default_dict = self.ngram_data
 
         for (tokens, poses), freq in default_dict.items():
-            if self.degree > 1:
-                tmp_tokens = tokens[:self.degree-1]
-            else:
-                tmp_tokens = tokens
-            if token_terms == tmp_tokens:
+            if token_terms == tokens:
                 yield poses if\
                         not include_freq\
                         else (poses, freq)
 
-    def freq_counts(
+    def pre_process(
             self,
             filename,
             size=None,
@@ -110,49 +101,20 @@ class PosNgram:
 
         return ngram_probs
 
-    def __is_similar(self, t1, t2):
-        # this function is used to check if
-        # two tuples are similar
-        # eg1. (c, a, c), (a, c, c) and (c, c, a) are similar
-        # eg2. (a, b, b) and (a, b, c) are not similar
-        t1 = list(t1)
-        t2 = list(t2)
-        assert len(t1) == len(t2)
-        for t in t1:
-            if t in t2:
-                t2.remove(t)
-        if len(t2) == 0:
-            return True
-        return False
-
-    def joint_freq(self, pos):
-        # (a, b, c):3 and (c, a, b):4
-        # are considered to be similar
-        # then the total freq is 3 + 4 = 7
-
+    def freq_count(self, term, target='pos'):
         tmp_freq = 0
-        for (_, p), freq in self.ngram_data.items():
-            if self.__is_similar(pos, p):
-                # print(_, p, freq)
-                tmp_freq += freq
+        if target == 'pos':
+            for (_, p), freq in self.ngram_data.items():
+                if term == p:
+                    # print(_, p, freq)
+                    tmp_freq += freq
+        else:
+            for (t, _), freq in self.ngram_data.items():
+                if term == t:
+                    print(t, _, freq)
+                    tmp_freq += freq
 
         return tmp_freq
-
-    def fetch_if_head(self, term, other, fetch_target='pos'):
-        tmp_set = set()
-        assert self.degree - other.degree == 1
-        if fetch_target == 'pos':
-            for (token, pos), freq in self.ngram_data.items():
-                curr_pos = pos[:-1]
-                if curr_pos == term:
-                    tmp_set.add(pos)
-        else:
-            for (token, pos), freq in self.ngram_data.items():
-                curr_token = token[-1:]
-                if curr_token == term:
-                    tmp_set.add(token)
-
-        return list(tmp_set)
 
     def __is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
@@ -164,9 +126,37 @@ class PosNgram:
             w2.remove(w)
         return True
 
-    def fetch_if_contain(self, term, other, fetch_target='pos'):
+    def fetch_if_prefix(self, term, fetch_target='pos'):
         tmp_set = set()
-        assert self.degree - other.degree == 1
+        if fetch_target == 'pos':
+            for (token, pos), freq in self.ngram_data.items():
+                curr_pos = pos[:-1]
+                if curr_pos == term:
+                    tmp_set.add(pos)
+        else:
+            for (token, pos), freq in self.ngram_data.items():
+                curr_token = token[:-1]
+                if curr_token == term:
+                    tmp_set.add(token)
+
+        return list(tmp_set)
+
+    def fetch_if_suffix(self, term, fetch_target='pos'):
+        tmp_set = set()
+        if fetch_target == 'pos':
+            for (token, pos), freq in self.ngram_data.items():
+                curr_pos = pos[-len(term):]
+                if curr_pos == term:
+                    tmp_set.add(pos)
+        else:
+            for (token, pos), freq in self.ngram_data.items():
+                curr_token = token[-len(term):]
+                if curr_token == term:
+                    tmp_set.add(token)
+        return list(tmp_set)
+
+    def fetch_if_contain(self, term, fetch_target='pos'):
+        tmp_set = set()
         if fetch_target == 'pos':
             for (token, pos), freq in self.ngram_data.items():
                 if self.__is_subcontent(term, pos):
@@ -219,6 +209,6 @@ if __name__ == '__main__':
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.freq_counts(filename, size)
-    b_model.freq_counts(filename, size)
-    t_model.freq_counts(filename, size)
+    u_model.pre_process(filename, size)
+    b_model.pre_process(filename, size)
+    t_model.pre_process(filename, size)

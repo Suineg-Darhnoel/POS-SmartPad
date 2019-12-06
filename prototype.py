@@ -264,9 +264,9 @@ if __name__ == '__main__':
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.freq_counts(filename, size)
-    b_model.freq_counts(filename, size)
-    t_model.freq_counts(filename, size)
+    u_model.pre_process(filename, size)
+    b_model.pre_process(filename, size)
+    t_model.pre_process(filename, size)
 
     notepad = Notepad()
     notepad.run()
