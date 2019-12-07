@@ -256,8 +256,7 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    filename = "austen-emma.txt"
-    # filename = "science.txt"
+    filename = "data/austen-emma.txt"
     size = 2*10**4 # just 1/8 of the whole file
     # size = None
 

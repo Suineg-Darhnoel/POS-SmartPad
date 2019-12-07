@@ -201,7 +201,7 @@ class PosNgram:
 
 if __name__ == '__main__':
     # testing
-    filename = "austen-emma.txt"
+    filename = "data/austen-emma.txt"
     size=10**4 # just 1/8 of the whole file
     # size = None
 

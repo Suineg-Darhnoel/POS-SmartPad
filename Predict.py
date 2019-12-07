@@ -103,8 +103,8 @@ def predict(
 if __name__== "__main__":
 
     test_files = [
-        "austen-emma.txt",
-        "science.txt"
+        "data/austen-emma.txt",
+        "data/science.txt"
     ]
 
     size=10**4 # just 1/8 of the whole file
