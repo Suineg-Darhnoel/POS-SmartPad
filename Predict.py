@@ -19,81 +19,79 @@ def predict_pos_token(
 
     # print(sent_poses)
     print_info = "<{}> with {:.2f}% probability being right."
-    next_pos_prob = FreqDist()
     the_pos = tuple(sent_poses)
 
-    print("You may try ... ")
+    print("\nYou may try...\n")
+    poses2suggest = FreqDist()
 
     if len(sent_poses) == 1:
         # bigram model
-        all_poses_in_b = ng_models[1].fetch_if_prefix(the_pos)
+        b_model = ng_models[1]
+        all_poses_in_b = b_model.fetch_if_prefix(the_pos)
 
         for p in all_poses_in_b:
-            n = ng_models[1].freq_count(p)
-            d = ng_models[0].freq_count(p[:-1])
-            next_pos_prob.update({p[-1]:n/d})
+            n = b_model.freq_count(p)
+            d = sum([
+                b_model.freq_count(b)
+                for b in b_model.fetch_if_prefix(p[:-1])
+            ])
+            poses2suggest.update({p[-1]:n/d})
 
-        print("You may try...")
-        result = next_pos_prob.most_common(3)
-        # print(result)
-
-        for pos, prob in result:
-
-            print(print_info.format(pos, prob*100))
-            words = list(ng_models[0].poses2tokens((pos,)))
-            words2suggest = random.sample(
-                words, min(len(words), 4)
-            )
-
-            print("For example: ", *words2suggest)
     elif len(sent_poses) == 2:
-        # trigram model
+        # bigram + trigram model
         the_pos_suffix = the_pos[-1:]
-        all_poses_in_b = ng_models[1].fetch_if_prefix(the_pos_suffix)
-        all_poses_in_t = ng_models[2].fetch_if_prefix(the_pos)
-        # print(1, all_poses_in_b)
-        # print(2, all_poses_in_t)
+        b_model = ng_models[1]
+        t_model = ng_models[2]
 
-        poses2suggest = FreqDist()
+        all_poses_in_b = b_model.fetch_if_prefix(the_pos_suffix)
+        all_poses_in_t = t_model.fetch_if_prefix(the_pos)
+
         for pos_b in all_poses_in_b:
-            # backoff
             p, pb, pt = 0, 0, 0
 
-            nb = ng_models[1].freq_count(pos_b)
-            db = ng_models[0].freq_count(pos_b[:-1])
+            nb = b_model.freq_count(pos_b)
+            db = sum([
+                b_model.freq_count(b)
+                for b in b_model.fetch_if_prefix(pos_b[:-1])
+            ])
+
             pb = nb / db
 
-            matched_t_pos = tuple()
+            pos_t = tuple()
             for x in all_poses_in_t:
                 if x[-len(pos_b):] == pos_b:
-                    matched_t_pos= x
-            # print(matched_t_pos)
+                    pos_t = x
 
-            if matched_t_pos:
-                nt = ng_models[2].freq_count(matched_t_pos)
-                dt = ng_models[1].freq_count(matched_t_pos[:-1])
+            if pos_t:
+                nt = t_model.freq_count(pos_t)
+                dt = sum([
+                    t_model.freq_count(t)
+                    for t in t_model.fetch_if_prefix(pos_t[:-1])
+                ])
                 pt = nt / dt
 
+            # interpolation
             p = 0.1 * pb + 0.9 * pt
-            # print(pb, pt)
             if pos_b[-1] not in poses2suggest:
                 poses2suggest.update({pos_b[-1] : p})
 
-        result = poses2suggest.most_common(3)
-        for pos, prob in result:
+    result = poses2suggest.most_common(mc)
 
-            print(print_info.format(pos, prob*100))
-            words = list(ng_models[0].poses2tokens((pos,)))
-            words2suggest = random.sample(
-                words, min(len(words), 4)
-            )
+    for pos, prob in result:
 
-            print("For example: ", *words2suggest)
+        print(print_info.format(pos, prob*100))
+        words = list(ng_models[0].poses2tokens((pos,)))
+        words2suggest = random.sample(
+            words, min(len(words), 4)
+        )
+
+        print("For example: ", *words2suggest)
 
 # start testing
 if __name__== "__main__":
     filename = "austen-emma.txt"
-    size=10**5 # just 1/8 of the whole file
+    filename = "science.txt"
+    size=10**4 # just 1/8 of the whole file
     # size = None
     # predict_pos_token('Frankly, I study')
 

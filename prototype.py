@@ -246,7 +246,7 @@ class Notepad:
 
         if key_typed in self.__delimiters:
             typed_string = self.__thisTextArea.get(1.0, END)
-            predict_pos_token(typed_string, u_model, b_model)
+            predict_pos_token(typed_string, u_model, b_model, t_model)
 
 
     def run(self):
@@ -257,7 +257,8 @@ class Notepad:
 # Run main application
 if __name__ == '__main__':
     filename = "austen-emma.txt"
-    size=10**4 # just 1/8 of the whole file
+    filename = "science.txt"
+    size = 3 * 10**5 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
