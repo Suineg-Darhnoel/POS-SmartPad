@@ -256,17 +256,20 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    filename = "data/austen-emma.txt"
-    size = 2*10**4 # just 1/8 of the whole file
+    test_files = [
+        "data/austen-emma.txt",
+        "data/science.txt"
+    ]
+    size = 3*10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.pre_process(filename, size)
-    b_model.pre_process(filename, size)
-    t_model.pre_process(filename, size)
+    u_model.pre_process(test_files[0], size)
+    b_model.pre_process(test_files[0], size)
+    t_model.pre_process(test_files[0], size)
 
     notepad = Notepad()
     notepad.run()

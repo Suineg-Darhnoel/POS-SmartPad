@@ -1,21 +1,25 @@
 from PosNgram import *
 from PosMapping import poscode2word
+import time
 import random
 
 def predict(
         ngram_sent,
         *ng_models,
-        mc=3
+        mc=3,
+        timer=False
     ):
 
     #########################################################
 
     # PREPROCESS
+    start = time.time()
     ngram_sent = ngram_sent.lower()
     sent_token_pos = pos_tag(
         word_tokenize(ngram_sent)
     )
 
+    # print(sent_token_pos)
     sent_poses = tuple([
         # need to update later
         pos for _, pos in sent_token_pos[-2:]
@@ -25,9 +29,6 @@ def predict(
 
     #########################################################
 
-    # PRINT
-    print_info = "<{}> \nwith {:.2f}% probability being right."
-    print("\nYou may try...\n")
     poses2suggest = FreqDist()
 
     #########################################################
@@ -84,6 +85,10 @@ def predict(
                 poses2suggest.update({pos_b[-1] : p})
 
     #########################################################
+    # PRINT
+    print_info = "----------< {} >----------"+\
+                 "\nwith {:.2f}% probability being right."
+    print("\nYou may try...")
 
     result = poses2suggest.most_common(mc)
 
@@ -95,7 +100,15 @@ def predict(
             words, min(len(words), 4)
         )
 
-        print("For example: ", *words2suggest)
+        words2suggest = [x[0] for x in words2suggest]
+        toprint = ""
+        for word in words2suggest:
+            toprint = ">>> " + word
+            print(toprint)
+
+    if timer:
+        print('exec_time: ', time.time()-start)
+    print("<>"*20)
 
     #########################################################
 
@@ -107,7 +120,7 @@ if __name__== "__main__":
         "data/science.txt"
     ]
 
-    size=10**4 # just 1/8 of the whole file
+    size = 10**4 # just 1/8 of the whole file
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)

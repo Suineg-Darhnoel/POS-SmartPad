@@ -1,12 +1,13 @@
 from math import log
 from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
+from progress.bar import IncrementalBar
 
 
 class PosNgram:
 
     def __init__(self, deg=1):
-        self.degree = deg
+        self.order = deg
         self.__sentence = ""
 
         # storing tokens and frequency
@@ -14,7 +15,7 @@ class PosNgram:
 
         # to prevent from illegral argument
         if deg < 1:
-            self.degree = 1
+            self.order = 1
 
     def poses2tokens(
             self,
@@ -24,7 +25,7 @@ class PosNgram:
         ):
         """
         # The token_terms must be the element of ngram_model
-        # whose degree is 1 smaller than that of the current one.
+        # whose order is 1 smaller than that of the current one.
         """
         if default_dict is None:
             default_dict = self.ngram_data
@@ -43,7 +44,7 @@ class PosNgram:
         ):
         """
         # The token_terms must be the element of ngram_model
-        # whose degree is 1 smaller than that of the current one.
+        # whose order is 1 smaller than that of the current one.
         """
         if default_dict is None:
             default_dict = self.ngram_data
@@ -69,11 +70,15 @@ class PosNgram:
 
             lines = fptr.readlines(size)
 
-        for line in lines:
-            self.__sentence = line.lower()
+        line_nums = len(lines)
+        print(filename, "ngram's order={}".format(self.order))
+        with IncrementalBar('Processing...', max=line_nums) as bar:
+            for line in lines:
+                bar.next()
+                self.__sentence = line.lower()
 
-            # Counting Step
-            self.ngram_data.update(self.__token_pos_pairs)
+                # Counting Step
+                self.ngram_data.update(self.__token_pos_pairs)
 
     def __freq2prob(
             self,
@@ -195,14 +200,14 @@ class PosNgram:
         # this returns the tuples of token pos pair
         return ngrams(
             self.__sent2pos_tag,
-            self.degree
+            self.order
         )
 
 
 if __name__ == '__main__':
     # testing
     filename = "data/austen-emma.txt"
-    size=10**4 # just 1/8 of the whole file
+    size = 10**5 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
