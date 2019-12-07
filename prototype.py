@@ -13,28 +13,28 @@ class Notepad:
     __root = Tk()
 
     # default window width and height
-    __thisWidth = 400
-    __thisHeight = 300
-    __thisTextArea = Text(__root)
-    __thisMenuBar = Menu(__root)
-    __thisFileMenu = Menu(__thisMenuBar, tearoff=0)
-    __thisEditMenu = Menu(__thisMenuBar, tearoff=0)
+    __this_width = 400
+    __this_height = 300
+    __this_text_area = Text(__root)
+    __this_menu_bar = Menu(__root)
+    __this_file_menu = Menu(__this_menu_bar, tearoff=0)
+    __this_edit_menu = Menu(__this_menu_bar, tearoff=0)
 
     # title
     __title = 'Untitled - AutoS-Notepad'
     # To add scrollbar
-    __thisScrollBar = Scrollbar(__thisTextArea)
+    __this_scroll_bar = Scrollbar(__this_text_area)
     __file = None
 
     def __init__(self, **kwargs):
         # set window size
         try:
-            self.__thisWidth = kwargs['width']
+            self.__this_width = kwargs['width']
         except KeyError:
             pass
 
         try:
-            self.__thisHeight = kwargs['height']
+            self.__this_height = kwargs['height']
         except KeyError:
             pass
 
@@ -48,73 +48,73 @@ class Notepad:
         screen_height = self.__root.winfo_screenheight()
 
         # For left-alling
-        left = screen_width/ 2 - self.__thisWidth / 2
+        left = screen_width/ 2 - self.__this_width / 2
 
         # For right-allign
-        top = screen_height / 2 - self.__thisHeight / 2
+        top = screen_height / 2 - self.__this_height / 2
 
         # For top and bottom
         self.__root.geometry('%dx%d+%d+%d'
-                % (self.__thisWidth,
-                   self.__thisHeight, left, top))
+                % (self.__this_width,
+                   self.__this_height, left, top))
 
         # MENU -------------------------------
 
         # To open new file
-        self.__thisFileMenu.add_command(
+        self.__this_file_menu.add_command(
                 label='New',
                 command=self.newFile,
                 accelerator="Ctrl+N")
 
         # To open a already existing file
-        self.__thisFileMenu.add_command(
+        self.__this_file_menu.add_command(
                 label='Open',
                 command=self.openFile,
                 accelerator="Ctrl+O")
 
         # To save current file
-        self.__thisFileMenu.add_command(
+        self.__this_file_menu.add_command(
                 label='Save',
                 command=self.saveFile,
                 accelerator="Ctrl+S")
 
         # To create a line in the dialog
-        self.__thisFileMenu.add_separator()
+        self.__this_file_menu.add_separator()
 
-        self.__thisFileMenu.add_command(label='Exit',
+        self.__this_file_menu.add_command(label='Exit',
                 command=self.quitApplication,
                 accelerator='Ctrl+Q')
 
-        self.__thisMenuBar.add_cascade(label='File',
-                menu=self.__thisFileMenu)
+        self.__this_menu_bar.add_cascade(label='File',
+                menu=self.__this_file_menu)
 
         # To give a feature of cut
-        self.__thisEditMenu.add_command(
+        self.__this_edit_menu.add_command(
                 label='Cut',
                 command=self.cut)
 
         # to give a feature of copy
-        self.__thisEditMenu.add_command(
+        self.__this_edit_menu.add_command(
                 label='Copy',
                 command=self.copy)
 
         # To give a feature of paste
-        self.__thisEditMenu.add_command(
+        self.__this_edit_menu.add_command(
                 label='Paste',
                 command=self.paste)
 
         # To give a feature of editing
-        self.__thisMenuBar.add_cascade(
+        self.__this_menu_bar.add_cascade(
                 label='Edit',
-                menu=self.__thisEditMenu)
+                menu=self.__this_edit_menu)
 
-        self.__root.config(menu=self.__thisMenuBar)
+        self.__root.config(menu=self.__this_menu_bar)
 
         # SCROLLBAR -------------------------------
 
         # Scrollbar will adjust automatically according to the content
-        self.__thisScrollBar.pack(side=RIGHT, fill=Y)
-        self.__thisScrollBar.config(command=self.__thisTextArea.yview)
+        self.__this_scroll_bar.pack(side=RIGHT, fill=Y)
+        self.__this_scroll_bar.config(command=self.__this_text_area.yview)
 
         # TEXTAREA -------------------------------
 
@@ -123,36 +123,36 @@ class Notepad:
         self.__root.grid_columnconfigure(0, weight=1)
 
         # Add controls (widget)
-        self.__thisTextArea.grid(sticky=N + E + S + W)
-        self.__thisTextArea.config(yscrollcommand=self.__thisScrollBar.set)
+        self.__this_text_area.grid(sticky=N + E + S + W)
+        self.__this_text_area.config(yscrollcommand=self.__this_scroll_bar.set)
 
         # get fired when encounter
         # one of the delimiters
-        self.__thisTextArea.bind(
+        self.__this_text_area.bind(
             "<KeyRelease>",
             self.call_detection
         )
 
         # Ctrl+N to Create New
-        self.__thisTextArea.bind(
+        self.__this_text_area.bind(
             "<Control-Key-n>",
             self.newFile
         )
 
         # Ctrl+N to Open File
-        self.__thisTextArea.bind(
+        self.__this_text_area.bind(
             "<Control-Key-o>",
             self.openFile
         )
 
         # Ctrl+Q to Exit
-        self.__thisTextArea.bind(
+        self.__this_text_area.bind(
             "<Control-Key-q>",
             self.quitApplication
         )
 
         # Ctrl+S to Save
-        self.__thisTextArea.bind(
+        self.__this_text_area.bind(
             "<Control-Key-s>",
             self.saveFile
         )
@@ -183,17 +183,17 @@ class Notepad:
                     os.path.basename(self.__file)
                     + notepad_name)
 
-            self.__thisTextArea.delete(1.0, END)
+            self.__this_text_area.delete(1.0, END)
 
             with open(self.__file, 'r') as file:
-                self.__thisTextArea.insert(1.0, file.read())
+                self.__this_text_area.insert(1.0, file.read())
 
     # NEWFILE
     def newFile(self, event=None):
 
         self.__root.title('Untitled - AutoS-Notepad')
         self.__file = None
-        self.__thisTextArea.delete(1.0, END)
+        self.__this_text_area.delete(1.0, END)
 
     # SAVEFILE
     def saveFile(self, event=None):
@@ -216,7 +216,7 @@ class Notepad:
 
                 # Try to save the file
                 with open(self.__file, 'w') as file:
-                    file.write(self.__thisTextArea.get(1.0, END))
+                    file.write(self.__this_text_area.get(1.0, END))
 
                 # Change the window title
                 self.__root.title(
@@ -224,16 +224,16 @@ class Notepad:
                         + ' - Notepad')
         else:
             with open(self.__file, 'w') as file:
-                file.write(self.__thisTextArea.get(1.0, END))
+                file.write(self.__this_text_area.get(1.0, END))
 
     def cut(self):
-        self.__thisTextArea.event_generate('<<Cut>>')
+        self.__this_text_area.event_generate('<<Cut>>')
 
     def copy(self):
-        self.__thisTextArea.event_generate('<<Copy>>')
+        self.__this_text_area.event_generate('<<Copy>>')
 
     def paste(self):
-        self.__thisTextArea.event_generate('<<Paste>>')
+        self.__this_text_area.event_generate('<<Paste>>')
 
     # live word detection
     __delimiters = [
@@ -245,8 +245,8 @@ class Notepad:
 
 
         if key_typed in self.__delimiters:
-            typed_string = self.__thisTextArea.get(1.0, END)
-            predict_pos_token(typed_string, u_model, b_model, t_model)
+            typed_string = self.__this_text_area.get(1.0, END)
+            predict(typed_string, u_model, b_model, t_model)
 
 
     def run(self):
@@ -257,8 +257,8 @@ class Notepad:
 # Run main application
 if __name__ == '__main__':
     filename = "austen-emma.txt"
-    filename = "science.txt"
-    size = 3 * 10**5 # just 1/8 of the whole file
+    # filename = "science.txt"
+    size = 2*10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)

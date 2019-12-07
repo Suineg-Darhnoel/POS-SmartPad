@@ -1,12 +1,16 @@
 from PosNgram import *
+from PosMapping import poscode2word
 import random
 
-def predict_pos_token(
+def predict(
         ngram_sent,
         *ng_models,
         mc=3
     ):
 
+    #########################################################
+
+    # PREPROCESS
     ngram_sent = ngram_sent.lower()
     sent_token_pos = pos_tag(
         word_tokenize(ngram_sent)
@@ -17,12 +21,16 @@ def predict_pos_token(
         pos for _, pos in sent_token_pos[-2:]
     ])
 
-    # print(sent_poses)
-    print_info = "<{}> with {:.2f}% probability being right."
     the_pos = tuple(sent_poses)
 
+    #########################################################
+
+    # PRINT
+    print_info = "<{}> \nwith {:.2f}% probability being right."
     print("\nYou may try...\n")
     poses2suggest = FreqDist()
+
+    #########################################################
 
     if len(sent_poses) == 1:
         # bigram model
@@ -75,11 +83,13 @@ def predict_pos_token(
             if pos_b[-1] not in poses2suggest:
                 poses2suggest.update({pos_b[-1] : p})
 
+    #########################################################
+
     result = poses2suggest.most_common(mc)
 
     for pos, prob in result:
 
-        print(print_info.format(pos, prob*100))
+        print(print_info.format(poscode2word(pos), prob*100))
         words = list(ng_models[0].poses2tokens((pos,)))
         words2suggest = random.sample(
             words, min(len(words), 4)
@@ -87,18 +97,22 @@ def predict_pos_token(
 
         print("For example: ", *words2suggest)
 
+    #########################################################
+
 # start testing
 if __name__== "__main__":
-    filename = "austen-emma.txt"
-    filename = "science.txt"
+
+    test_files = [
+        "austen-emma.txt",
+        "science.txt"
+    ]
+
     size=10**4 # just 1/8 of the whole file
-    # size = None
-    # predict_pos_token('Frankly, I study')
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.pre_process(filename, size)
-    b_model.pre_process(filename, size)
-    t_model.pre_process(filename, size)
+    u_model.pre_process(test_files[1], size)
+    b_model.pre_process(test_files[1], size)
+    t_model.pre_process(test_files[1], size)
