@@ -57,28 +57,29 @@ class PosNgram:
 
     def pre_process(
             self,
-            filename,
+            *filenames,
             size=None,
         ):
 
         self.ngram_data = FreqDist()
-        with open(
-                filename,
-                encoding="utf-8",
-                errors="ignore"
-            ) as fptr:
+        for filename in filenames:
+            with open(
+                    filename,
+                    encoding="utf-8",
+                    errors="ignore"
+                ) as fptr:
 
-            lines = fptr.readlines(size)
+                lines = fptr.readlines(size)
 
-        line_nums = len(lines)
-        print(filename, "ngram's order={}".format(self.order))
-        with IncrementalBar('Processing...', max=line_nums) as bar:
-            for line in lines:
-                bar.next()
-                self.__sentence = line.lower()
+            line_nums = len(lines)
+            print(filename, "ngram's order={}".format(self.order))
+            with IncrementalBar('Processing...', max=line_nums) as bar:
+                for line in lines:
+                    bar.next()
+                    self.__sentence = line.lower()
 
-                # Counting Step
-                self.ngram_data.update(self.__token_pos_pairs)
+                    # Counting Step
+                    self.ngram_data.update(self.__token_pos_pairs)
 
     def __freq2prob(
             self,
@@ -206,14 +207,17 @@ class PosNgram:
 
 if __name__ == '__main__':
     # testing
-    filename = "data/austen-emma.txt"
-    size = 10**5 # just 1/8 of the whole file
+    filenames = [
+        "data/austen-emma.txt",
+        "data/science.txt"
+    ]
+    size = 10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.pre_process(filename, size)
-    b_model.pre_process(filename, size)
-    t_model.pre_process(filename, size)
+    u_model.pre_process(*filenames, size=size)
+    b_model.pre_process(*filenames, size=size)
+    t_model.pre_process(*filenames, size=size)

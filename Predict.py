@@ -80,7 +80,7 @@ def predict(
                 pt = nt / dt
 
             # interpolation
-            p = 0.1 * pb + 0.9 * pt
+            p = 0.2 * pb + 0.8 * pt
             if pos_b[-1] not in poses2suggest:
                 poses2suggest.update({pos_b[-1] : p})
 
@@ -126,6 +126,6 @@ if __name__== "__main__":
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.pre_process(test_files[1], size)
-    b_model.pre_process(test_files[1], size)
-    t_model.pre_process(test_files[1], size)
+    u_model.pre_process(test_files[1], size=size)
+    b_model.pre_process(test_files[1], size=size)
+    t_model.pre_process(test_files[1], size=size)

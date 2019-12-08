@@ -267,9 +267,9 @@ if __name__ == '__main__':
     b_model = PosNgram(2)
     t_model = PosNgram(3)
 
-    u_model.pre_process(test_files[0], size)
-    b_model.pre_process(test_files[0], size)
-    t_model.pre_process(test_files[0], size)
+    u_model.pre_process(test_files[0], size=size)
+    b_model.pre_process(test_files[0], size=size)
+    t_model.pre_process(test_files[0], size=size)
 
     notepad = Notepad()
     notepad.run()
