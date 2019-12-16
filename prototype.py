@@ -260,7 +260,7 @@ if __name__ == '__main__':
         "data/austen-emma.txt",
         "data/science.txt"
     ]
-    size = 3*10**4 # just 1/8 of the whole file
+    size = 5 * 10**4 # just 1/8 of the whole file
     # size = None
 
     u_model = PosNgram(1)

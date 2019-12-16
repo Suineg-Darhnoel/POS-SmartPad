@@ -21,7 +21,6 @@ def predict(
 
     # print(sent_token_pos)
     sent_poses = tuple([
-        # need to update later
         pos for _, pos in sent_token_pos[-2:]
     ])
 
@@ -36,14 +35,11 @@ def predict(
     if len(sent_poses) == 1:
         # bigram model
         b_model = ng_models[1]
-        all_poses_in_b = b_model.fetch_if_prefix(the_pos)
+        all_poses_freq_in_b = b_model.fetch_if_prefix(the_pos)
 
-        for p in all_poses_in_b:
-            n = b_model.freq_count(p)
-            d = sum([
-                b_model.freq_count(b)
-                for b in b_model.fetch_if_prefix(p[:-1])
-            ])
+        for p, freq in all_poses_freq_in_b.items():
+            n = freq
+            d = b_model.fetch_if_prefix(p[:-1]).N() + 0.001
             poses2suggest.update({p[-1]:n/d})
 
     elif len(sent_poses) == 2:
@@ -52,31 +48,24 @@ def predict(
         b_model = ng_models[1]
         t_model = ng_models[2]
 
-        all_poses_in_b = b_model.fetch_if_prefix(the_pos_suffix)
-        all_poses_in_t = t_model.fetch_if_prefix(the_pos)
+        all_poses_freq_in_b = b_model.fetch_if_prefix(the_pos_suffix)
+        all_poses_freq_in_t = t_model.fetch_if_prefix(the_pos)
 
-        for pos_b in all_poses_in_b:
+        for pos_b, freq_b in all_poses_freq_in_b.items():
             p, pb, pt = 0, 0, 0
 
-            nb = b_model.freq_count(pos_b)
-            db = sum([
-                b_model.freq_count(b)
-                for b in b_model.fetch_if_prefix(pos_b[:-1])
-            ])
-
+            nb = freq_b
+            db = b_model.fetch_if_prefix(pos_b[:-1]).N() + 0.001
             pb = nb / db
 
             pos_t = tuple()
-            for x in all_poses_in_t:
+            for x in all_poses_freq_in_t:
                 if x[-len(pos_b):] == pos_b:
                     pos_t = x
 
             if pos_t:
-                nt = t_model.freq_count(pos_t)
-                dt = sum([
-                    t_model.freq_count(t)
-                    for t in t_model.fetch_if_prefix(pos_t[:-1])
-                ])
+                nt = all_poses_freq_in_t[pos_t]
+                dt = t_model.fetch_if_prefix(pos_t[:-1]).N() + 0.001
                 pt = nt / dt
 
             # interpolation
@@ -120,7 +109,7 @@ if __name__== "__main__":
         "data/science.txt"
     ]
 
-    size = 10**4 # just 1/8 of the whole file
+    size = 3*10**5 # just 1/8 of the whole file
 
     u_model = PosNgram(1)
     b_model = PosNgram(2)
