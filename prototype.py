@@ -6,7 +6,9 @@ import os
 from tkinter import *
 from tkinter.messagebox import *
 from tkinter.filedialog import *
+from past.builtins import execfile
 from Predict import *
+
 
 class Notepad:
 
@@ -256,20 +258,7 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    test_files = [
-        "data/austen-emma.txt",
-        "data/science.txt"
-    ]
-    size = 5 * 10**4 # just 1/8 of the whole file
-    # size = None
-
-    u_model = PosNgram(1)
-    b_model = PosNgram(2)
-    t_model = PosNgram(3)
-
-    u_model.pre_process(test_files[0], size=size)
-    b_model.pre_process(test_files[0], size=size)
-    t_model.pre_process(test_files[0], size=size)
+    execfile('Mytest.py')
 
     notepad = Notepad()
     notepad.run()

@@ -2,7 +2,12 @@ from math import log
 from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
 from progress.bar import IncrementalBar as ICB
+from past.builtins import execfile
 
+# GLOBAL VARIABLE
+suffix = 'suffix'
+prefix = 'prefix'
+contain = 'contain'
 
 class PosNgram:
 
@@ -16,18 +21,6 @@ class PosNgram:
         # to prevent from illegral argument
         if deg < 1:
             self.order = 1
-
-    def poses_data(self):
-        tmp_data = FreqDist()
-        for (_, pos), freq in self.ngram_data.items():
-            tmp_data.update({pos:freq})
-        return tmp_data
-
-    def tokens_data(self):
-        tmp_data = FreqDist()
-        for (token, _), freq in self.ngram_data.items():
-            tmp_data.update({token:freq})
-        return tmp_data
 
     def poses2tokens(
             self,
@@ -99,7 +92,6 @@ class PosNgram:
             self,
             include_token=True
         ):
-        # need to improve !!!!!!!!!
         ngram_probs = FreqDist()
 
         if include_token:
@@ -136,7 +128,7 @@ class PosNgram:
 
         return tmp_freq
 
-    def __is_subcontent(self, w1, w2):
+    def is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
         w1 = list(w1)
         w2 = list(w2)
@@ -146,45 +138,53 @@ class PosNgram:
             w2.remove(w)
         return True
 
-    def fetch_if_prefix(self, term, fetch_target='pos'):
-        tmp_set = FreqDist()
-        if fetch_target == 'pos':
-            for (token, pos), freq in self.ngram_data.items():
-                curr_pos = pos[:-1]
-                if curr_pos == term:
-                    tmp_set.update({pos: freq})
-        else:
-            for (token, pos), freq in self.ngram_data.items():
-                curr_token = token[:-1]
-                if curr_token == term:
-                    tmp_set.update({token: freq})
-        return tmp_set
+    def fetch_if(
+            self,
+            cond,
+            term,
+            pos_is_target=True,
+            include_pair=False
+        ):
 
-    def fetch_if_suffix(self, term, fetch_target='pos'):
-        tmp_set = FreqDist()
-        if fetch_target == 'pos':
-            for (token, pos), freq in self.ngram_data.items():
-                curr_pos = pos[-len(term):]
-                if curr_pos == term:
-                    tmp_set.update({pos: freq})
-        else:
-            for (token, pos), freq in self.ngram_data.items():
-                curr_token = token[-len(term):]
-                if curr_token == term:
-                    tmp_set.update({token: freq})
-        return tmp_set
+        tmp_freq_dist = FreqDist()
 
-    def fetch_if_contain(self, term, fetch_target='pos'):
-        tmp_set = FreqDist()
-        if fetch_target == 'pos':
+        conditions = {
+            prefix : [
+                "pos[:-1] == term",
+                "token[:-1] == term"
+            ],
+            suffix : [
+                "pos[-len(term):] == term",
+                "token[-len(term):] == term"
+            ],
+            contain : [
+                "self.is_subcontent(term, pos)",
+                "self.is_subcontent(term , token)"
+            ]
+        }
+
+        if cond not in conditions:
+            cond = prefix
+
+        # Fetching Choice Configuration
+        p_key, t_key = "", ""
+        if include_pair:
+            p_key = "(pos, token)"
+            t_key = "(token, pos)"
+        else:
+            p_key = "pos"
+            t_key = "token"
+
+        if pos_is_target:
             for (token, pos), freq in self.ngram_data.items():
-                if self.__is_subcontent(term, pos):
-                    tmp_set.update({pos: freq})
+                if eval(conditions[cond][0]):
+                    tmp_freq_dist.update({eval(p_key): freq})
         else:
             for (token, pos), freq in self.ngram_data.items():
-                if self.__is_subcontent(term, token):
-                    tmp_set.update({token: freq})
-        return tmp_set
+                if eval(conditions[cond][1]):
+                    tmp_freq_dist.update({eval(t_key): freq})
+
+        return tmp_freq_dist
 
     def show_prob_info(self, mc=10, include_token=False):
         for elem in self.__freq2prob(include_token).most_common(mc):
@@ -218,18 +218,4 @@ class PosNgram:
 
 
 if __name__ == '__main__':
-    # testing
-    filenames = [
-        "data/austen-emma.txt",
-        "data/science.txt"
-    ]
-    size = 10**5 # just 1/8 of the whole file
-    # size = None
-
-    u_model = PosNgram(1)
-    b_model = PosNgram(2)
-    t_model = PosNgram(3)
-
-    u_model.pre_process(*filenames, size=size)
-    b_model.pre_process(*filenames, size=size)
-    t_model.pre_process(*filenames, size=size)
+    execfile('Mytest.py')
