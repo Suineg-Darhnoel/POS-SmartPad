@@ -5,9 +5,9 @@ from progress.bar import IncrementalBar as ICB
 from past.builtins import execfile
 
 # GLOBAL VARIABLE
-suffix = 'suffix'
-prefix = 'prefix'
-contain = 'contain'
+ng_suffix = 'suffix'
+ng_prefix = 'prefix'
+ng_contain = 'contain'
 
 class PosNgram:
 
@@ -84,11 +84,11 @@ class PosNgram:
                     self.__sentence = line.lower()
 
                     # Counting Step
-                    self.ngram_data.update(self.__token_pos_pairs)
+                    self.ngram_data.update(self._token_pos_pairs)
 
         print('dict_size = {}'.format(self.ngram_data.B()))
 
-    def __freq2prob(
+    def _freq2prob(
             self,
             include_token=True
         ):
@@ -128,7 +128,7 @@ class PosNgram:
 
         return tmp_freq
 
-    def is_subcontent(self, w1, w2):
+    def _is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
         w1 = list(w1)
         w2 = list(w2)
@@ -149,17 +149,17 @@ class PosNgram:
         tmp_freq_dist = FreqDist()
 
         conditions = {
-            prefix : [
+            ng_prefix : [
                 "pos[:-1] == term",
                 "token[:-1] == term"
             ],
-            suffix : [
+            ng_suffix : [
                 "pos[-len(term):] == term",
                 "token[-len(term):] == term"
             ],
-            contain : [
-                "self.is_subcontent(term, pos)",
-                "self.is_subcontent(term , token)"
+            ng_contain : [
+                "self._is_subcontent(term, pos)",
+                "self._is_subcontent(term , token)"
             ]
         }
 
@@ -174,45 +174,57 @@ class PosNgram:
         else:
             p_key = "pos"
             t_key = "token"
+        cmp_p = compile(p_key, '<string>', 'eval')
+        cmp_t = compile(t_key, '<string>', 'eval')
 
         if pos_is_target:
+            cmp_cond = compile(
+                    conditions[cond][0],
+                    '<string>',
+                    'eval'
+                )
             for (token, pos), freq in self.ngram_data.items():
-                if eval(conditions[cond][0]):
-                    tmp_freq_dist.update({eval(p_key): freq})
+                if eval(cmp_cond):
+                    tmp_freq_dist.update({eval(cmp_p): freq})
         else:
+            cmp_cond = compile(
+                    conditions[cond][1],
+                    '<string>',
+                    'eval'
+                )
             for (token, pos), freq in self.ngram_data.items():
-                if eval(conditions[cond][1]):
-                    tmp_freq_dist.update({eval(t_key): freq})
+                if eval(cmp_cond):
+                    tmp_freq_dist.update({eval(cmp_t): freq})
 
         return tmp_freq_dist
 
     def show_prob_info(self, mc=10, include_token=False):
-        for elem in self.__freq2prob(include_token).most_common(mc):
+        for elem in self._freq2prob(include_token).most_common(mc):
             print(elem)
 
     @property
-    def __token_pos_pairs(self):
+    def _token_pos_pairs(self):
         """
         This function maps terms to POS
         (The previous version's name was phi1)
         """
-        for elems in self.__ngram_tokens_pos:
+        for elems in self._ngram_tokens_pos:
             poses = [elem[1] for elem in elems]
 
             tokens = [elem[0] for elem in elems]
             yield (tuple(tokens), tuple(poses))
 
     @property
-    def __sent2pos_tag(self):
+    def _sent2pos_tag(self):
         sent = self.__sentence.lower()
         tokens = word_tokenize(sent)
         return pos_tag(tokens)
 
     @property
-    def __ngram_tokens_pos(self):
+    def _ngram_tokens_pos(self):
         # this returns the tuples of token pos pair
         return ngrams(
-            self.__sent2pos_tag,
+            self._sent2pos_tag,
             self.order
         )
 
