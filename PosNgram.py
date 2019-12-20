@@ -78,7 +78,7 @@ class PosNgram:
 
             line_nums = len(lines)
             print(filename, "ngram's order={}".format(self.order))
-            with ICB('Processing...', max=line_nums) as bar:
+            with ICB('Processing...', max=line_nums, suffix='%(percent)d%%') as bar:
                 for line in lines:
                     bar.next()
                     self.__sentence = line.lower()
