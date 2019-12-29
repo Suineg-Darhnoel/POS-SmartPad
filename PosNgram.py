@@ -3,11 +3,13 @@ from math import exp
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
 from progress.bar import IncrementalBar as ICB
 from past.builtins import execfile
+import time
 
 # GLOBAL VARIABLE
 ng_suffix = 'suffix'
 ng_prefix = 'prefix'
 ng_contain = 'contain'
+ng_equal = 'equal'
 
 class PosNgram:
 
@@ -65,6 +67,7 @@ class PosNgram:
             *filenames,
             size=None,
         ):
+        start_processing = time.time()
 
         self.ngram_data = FreqDist()
         for filename in filenames:
@@ -78,7 +81,11 @@ class PosNgram:
 
             line_nums = len(lines)
             print(filename, "ngram's order={}".format(self.order))
-            with ICB('Processing...', max=line_nums, suffix='%(percent)d%%') as bar:
+            with ICB(
+                        'Processing...',
+                        max=line_nums,
+                        suffix='%(percent)d%%'
+                    ) as bar:
                 for line in lines:
                     bar.next()
                     self.__sentence = line.lower()
@@ -87,46 +94,8 @@ class PosNgram:
                     self.ngram_data.update(self._token_pos_pairs)
 
         print('dict_size = {}'.format(self.ngram_data.B()))
-
-    def _freq2prob(
-            self,
-            include_token=True
-        ):
-        ngram_probs = FreqDist()
-
-        if include_token:
-            for elem in self.ngram_data:
-                ngram_probs.update(
-                    {elem : self.ngram_data.freq(elem)}
-                )
-        else:
-            new_ngram_data = FreqDist()
-            for elem in self.ngram_data:
-                new_ngram_data.update(
-                    {elem[1]}
-                )
-
-            for elem in new_ngram_data:
-                ngram_probs.update(
-                    {elem : new_ngram_data.freq(elem)}
-                )
-
-        return ngram_probs
-
-    def freq_count(self, term, target='pos'):
-        tmp_freq = 0
-        if target == 'pos':
-            for (_, p), freq in self.ngram_data.items():
-                if term == p:
-                    # print(_, p, freq)
-                    tmp_freq += freq
-        else:
-            for (t, _), freq in self.ngram_data.items():
-                if term == t:
-                    # print(t, _, freq)
-                    tmp_freq += freq
-
-        return tmp_freq
+        # end of predicting
+        print("loading time = {}".format(time.time()-start_processing))
 
     def _is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
@@ -160,6 +129,10 @@ class PosNgram:
             ng_contain : [
                 "self._is_subcontent(term, pos)",
                 "self._is_subcontent(term , token)"
+            ],
+            ng_equal: [
+                "pos == term",
+                "token == term"
             ]
         }
 
@@ -197,10 +170,6 @@ class PosNgram:
                     tmp_freq_dist.update({eval(cmp_t): freq})
 
         return tmp_freq_dist
-
-    def show_prob_info(self, mc=10, include_token=False):
-        for elem in self._freq2prob(include_token).most_common(mc):
-            print(elem)
 
     @property
     def _token_pos_pairs(self):
