@@ -1,6 +1,8 @@
 from math import log
 from math import exp
+from math import floor
 from nltk import ngrams, pos_tag, word_tokenize, FreqDist
+from nltk.corpus import gutenberg
 from progress.bar import IncrementalBar as ICB
 from past.builtins import execfile
 import time
@@ -94,8 +96,31 @@ class PosNgram:
                     self.ngram_data.update(self._token_pos_pairs)
 
         print('dict_size = {}'.format(self.ngram_data.B()))
-        # end of predicting
         print("loading time = {}".format(time.time()-start_processing))
+
+    def train(
+            self,
+            file_id,
+            training_size=30
+        ):
+
+        self.ngram_data = FreqDist()
+
+        sents = gutenberg.sents(file_id)
+        t_size = floor((training_size/100) * len(sents))
+
+        line_nums = len(sents)
+        with ICB(
+                    'Processing...',
+                    max=line_nums,
+                    suffix='%(percent)d%%'
+                ) as bar:
+            for sent in sents:
+                bar.next()
+                self.__sentence = " ".join(sent).lower()
+
+                # Counting Step
+                self.ngram_data.update(self._token_pos_pairs)
 
     def _is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
