@@ -1,6 +1,7 @@
 from PosNgram import *
 from PosMapping import poscode2word
 from past.builtins import execfile
+from math import log
 import time
 import random
 
@@ -10,13 +11,34 @@ class Predict:
     def __init__(
             self,
             context,
-            model_nums=2,
-            size=10**4
+            model_nums=3,
+            size=90
         ):
         assert model_nums >= 2
-        self.ng_models = [PosNgram(i) for i in range(1, model_nums+1)]
+        self.ng_models = [
+                PosNgram(i)
+                for i in range(1, model_nums+1)
+            ]
         for model in self.ng_models:
-            model.pre_process(context, size=size)
+            model.pre_process(context, training_size=size)
+
+    def prior_probs(self, sentence, model, word_nums=4):
+        sentence = sentence.lower()
+        sents = word_tokenize(sentence)
+
+        token_pos_ngram = ngrams(
+                    pos_tag(sents),
+                    model.order
+                )
+
+        for elem in token_pos_ngram:
+            pos = tuple((r for _, r in elem))
+
+            data = model.fetch_if("prefix", pos[:-1])
+            n = data[pos]
+            d = data.N()
+            print(pos, n/d)
+
 
     def direct_fetching(self, last_token, model):
         fetched_bdata = model.fetch_if(
@@ -47,6 +69,7 @@ class Predict:
             ngram_sent,
             mc=3,
         ):
+        start_predicting = time.time()
 
         #########################################################
 
@@ -58,6 +81,7 @@ class Predict:
         # print(sent_token_pos)
 
         sent_tokens = tuple(token for token, _ in sent_token_pos[-2:])
+        print(sent_tokens)
         sent_poses = tuple(pos for _, pos in sent_token_pos[-2:])
 
         b_model = self.ng_models[1]
@@ -75,12 +99,11 @@ class Predict:
         if len(sent_poses) == 1:
             # bigram model
             all_poses_freq_in_b = b_model.fetch_if('prefix', sent_poses[-1:])
+            d = all_poses_freq_in_b.N() + epsilon
             for p, freq in all_poses_freq_in_b.items():
                 n = freq
-                d = b_model.fetch_if('prefix', p[:-1]).N() + epsilon
                 poses2suggest.update({p[-1]:n/d})
 
-        # TRIGRAM HAS THE DIFFICULTY IN PERFORMACE FOR BIG DATA
         elif len(sent_poses) == 2:
             # bigram + trigram model
             t_model = self.ng_models[2]
@@ -89,11 +112,11 @@ class Predict:
             all_poses_freq_in_b = b_model.fetch_if('prefix', the_pos_suffix)
             all_poses_freq_in_t = t_model.fetch_if('prefix', sent_poses)
 
+            db = all_poses_freq_in_b.N() + epsilon
             for pos_b, freq_b in all_poses_freq_in_b.items():
                 p, pb, pt = 0, 0, 0
 
                 nb = freq_b
-                db = b_model.fetch_if('prefix', pos_b[:-1]).N() + epsilon
                 pb = nb / db
 
                 pos_t = tuple()
@@ -118,25 +141,26 @@ class Predict:
         print("\nYou may try...")
 
         result = poses2suggest.most_common(mc)
+        print(result)
         for pos, prob in result:
 
             print(print_info.format(poscode2word(pos), prob*100))
-            words = list(self.ng_models[1].poses2tokens((pos,)))
+            words = list(self.ng_models[0].poses2tokens((pos,)))
             words2suggest = random.sample(
                 words, min(len(words), 4)
             )
 
             words2suggest = [x[0] for x in words2suggest]
-            toprint = ""
             for word in words2suggest:
-                toprint = ">>> " + word
-                print(toprint)
+                print(">>> " + word)
 
          # 1st: Suggest words from Bigram's dictionary
          # 2nd: If there is no word in the Bigram, just
          # randomly apply POS to suggest words
 
         print("<>"*20)
+        # end of predicting
+        print("exec time = {}".format(time.time()-start_predicting))
 
         #########################################################
 

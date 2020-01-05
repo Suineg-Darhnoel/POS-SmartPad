@@ -20,7 +20,8 @@ class PosNgram:
         self.__sentence = ""
 
         # storing tokens and frequency
-        self.ngram_data = FreqDist()
+        self.train_data = FreqDist()
+        self.test_sents = None
 
         # to prevent from illegral argument
         if deg < 1:
@@ -37,7 +38,7 @@ class PosNgram:
         # whose order is 1 smaller than that of the current one.
         """
         if default_dict is None:
-            default_dict = self.ngram_data
+            default_dict = self.train_data
 
         for (tokens, poses), freq in default_dict.items():
             if pos_terms == poses:
@@ -56,7 +57,7 @@ class PosNgram:
         # whose order is 1 smaller than that of the current one.
         """
         if default_dict is None:
-            default_dict = self.ngram_data
+            default_dict = self.train_data
 
         for (tokens, poses), freq in default_dict.items():
             if token_terms == tokens:
@@ -64,33 +65,40 @@ class PosNgram:
                         not include_freq\
                         else (poses, freq)
 
-    def train(
+    def pre_process(
             self,
             file_id,
-            training_size=100
+            training_size=90
         ):
 
         start_processing = time.time()
-        self.ngram_data = FreqDist()
+        self.train_data = FreqDist()
 
         sents = gutenberg.sents(file_id)
         t_size = floor((training_size/100) * len(sents))
 
-        sents = sents[:t_size]
+        train_sents = sents[:t_size]
+        self.test_sents = sents[t_size:]
 
-        print(file_id, "ngram's order={}".format(self.order))
+        p_title = "file_id = <{}>, ngram's order = {}, split_ratio = {}-{}"
+        print(p_title.format(
+                file_id,
+                self.order,
+                training_size,
+                100-training_size)
+            )
         with ICB(
                     'Processing...',
-                    max=len(sents),
+                    max=len(train_sents),
                     suffix='%(percent)d%%'
                 ) as bar:
-            for sent in sents:
+
+            for sent in train_sents:
                 bar.next()
                 self.__sentence = " ".join(sent).lower()
+                self.train_data.update(self._token_pos_pairs)
 
-                # Counting Step
-                self.ngram_data.update(self._token_pos_pairs)
-        print('dict_size = {}'.format(self.ngram_data.B()))
+        print('dict_size = {}'.format(self.train_data.B()))
         print("loading time = {}".format(time.time()-start_processing))
 
     def _is_subcontent(self, w1, w2):
@@ -152,7 +160,7 @@ class PosNgram:
                     '<string>',
                     'eval'
                 )
-            for (token, pos), freq in self.ngram_data.items():
+            for (token, pos), freq in self.train_data.items():
                 if eval(cmp_cond):
                     tmp_freq_dist.update({eval(cmp_p): freq})
         else:
@@ -161,7 +169,7 @@ class PosNgram:
                     '<string>',
                     'eval'
                 )
-            for (token, pos), freq in self.ngram_data.items():
+            for (token, pos), freq in self.train_data.items():
                 if eval(cmp_cond):
                     tmp_freq_dist.update({eval(cmp_t): freq})
 
