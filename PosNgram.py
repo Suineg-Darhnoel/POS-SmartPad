@@ -64,55 +64,24 @@ class PosNgram:
                         not include_freq\
                         else (poses, freq)
 
-    def pre_process(
-            self,
-            *filenames,
-            size=None,
-        ):
-        start_processing = time.time()
-
-        self.ngram_data = FreqDist()
-        for filename in filenames:
-            with open(
-                    filename,
-                    encoding="utf-8",
-                    errors="ignore"
-                ) as fptr:
-
-                lines = fptr.readlines(size)
-
-            line_nums = len(lines)
-            print(filename, "ngram's order={}".format(self.order))
-            with ICB(
-                        'Processing...',
-                        max=line_nums,
-                        suffix='%(percent)d%%'
-                    ) as bar:
-                for line in lines:
-                    bar.next()
-                    self.__sentence = line.lower()
-
-                    # Counting Step
-                    self.ngram_data.update(self._token_pos_pairs)
-
-        print('dict_size = {}'.format(self.ngram_data.B()))
-        print("loading time = {}".format(time.time()-start_processing))
-
     def train(
             self,
             file_id,
-            training_size=30
+            training_size=100
         ):
 
+        start_processing = time.time()
         self.ngram_data = FreqDist()
 
         sents = gutenberg.sents(file_id)
         t_size = floor((training_size/100) * len(sents))
 
-        line_nums = len(sents)
+        sents = sents[:t_size]
+
+        print(file_id, "ngram's order={}".format(self.order))
         with ICB(
                     'Processing...',
-                    max=line_nums,
+                    max=len(sents),
                     suffix='%(percent)d%%'
                 ) as bar:
             for sent in sents:
@@ -121,6 +90,8 @@ class PosNgram:
 
                 # Counting Step
                 self.ngram_data.update(self._token_pos_pairs)
+        print('dict_size = {}'.format(self.ngram_data.B()))
+        print("loading time = {}".format(time.time()-start_processing))
 
     def _is_subcontent(self, w1, w2):
         assert len(w1) <= len(w2)
