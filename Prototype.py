@@ -248,7 +248,7 @@ class Notepad:
 
         if key_typed in self.__delimiters:
             typed_string = self.__this_text_area.get(1.0, END)
-            predict(typed_string, u_model, b_model, t_model)
+            model.predict(typed_string)
 
 
     def run(self):
@@ -258,7 +258,6 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    execfile('Mytest.py')
-
+    model = Predict("shakespeare-hamlet.txt", t_size=50)
     notepad = Notepad()
     notepad.run()
