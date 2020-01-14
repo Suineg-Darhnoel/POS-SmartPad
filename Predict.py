@@ -82,6 +82,25 @@ class Predict:
 
         return pos_freq_token
 
+    def ngram_test(self, order):
+        # >>> conduct testing on bigram
+        # >>> conduct testing on trigram
+        # >>> conduct testing on bigram + trigram
+        # trigram + brigram
+        # testing's starting time
+        start_testing = time.time()
+
+        for sent in self.ng_models[1].test_sents:
+            sentence = " ".join(sent).lower()
+            pos_tag_ngram = ngrams(pos_tag(word_tokenize(sentence)), order)
+
+            for token_poses in pos_tag_ngram:
+                pos = tuple()
+                for _, p in token_poses:
+                    pos += (p,)
+                print(pos)
+        # end of testing
+        print("exec time = {}".format(time.time()-start_testing))
 
     def predict(
             self,
@@ -100,7 +119,6 @@ class Predict:
         # print(sent_token_pos)
 
         sent_tokens = tuple(token for token, _ in sent_token_pos[-2:])
-        print(sent_tokens)
         sent_poses = tuple(pos for _, pos in sent_token_pos[-2:])
 
         b_model = self.ng_models[1]
@@ -109,7 +127,7 @@ class Predict:
 
         # TRY IF THE THE LAST TOKEN EXISTS IN BIGRAM
         last_token = tuple(sent_tokens[-1:])
-        print('last token is: ', last_token)
+        # print('last token is: ', last_token)
 
         #########################################################
         epsilon = 0.001
@@ -117,7 +135,8 @@ class Predict:
 
         if len(sent_poses) == 1:
             # bigram model
-            all_poses_freq_in_b = b_model.fetch_if('prefix', sent_poses[-1:])
+            all_poses_freq_in_b = \
+                    b_model.fetch_if('prefix', sent_poses[-1:])
             d = all_poses_freq_in_b.N() + epsilon
             for p, freq in all_poses_freq_in_b.items():
                 n = freq
@@ -128,8 +147,10 @@ class Predict:
             t_model = self.ng_models[2]
             the_pos_suffix = sent_poses[-1:]
 
-            all_poses_freq_in_b = b_model.fetch_if('prefix', the_pos_suffix)
-            all_poses_freq_in_t = t_model.fetch_if('prefix', sent_poses)
+            all_poses_freq_in_b = \
+                    b_model.fetch_if('prefix', the_pos_suffix)
+            all_poses_freq_in_t = \
+                    t_model.fetch_if('prefix', sent_poses)
 
             db = all_poses_freq_in_b.N() + epsilon
             for pos_b, freq_b in all_poses_freq_in_b.items():
@@ -156,12 +177,16 @@ class Predict:
         ##########################################################
         ## PRINT
         print_info = "----------< {} >----------"+\
-                     "\nwith total score = {:.2f} being correct."
+                     "\nwith estimated probability ~ {:.2f}%"
         print("\nYou may try...")
 
         # last_token to pos_token = lt2pt
         lt2pt = self.last_token2pos_token((last_token),b_model)
-        # print(lt2pt)
+        total_freqs_lt2pt = 0
+        for pos, vals in lt2pt.items():
+            total_freqs_lt2pt += sum(vals)
+
+        # print(total_freqs_lt2pt)
 
         final_pos_score = FreqDist()
         if lt2pt:
@@ -169,8 +194,8 @@ class Predict:
                 if pos not in lt2pt:
                     res = 0
                 else:
-                    res = sum(lt2pt[pos])
-                    final_pos_score.update({pos:prob * res})
+                    res = sum(lt2pt[pos])/total_freqs_lt2pt
+                    final_pos_score.update({pos: 100* prob * res})
         # final_pos_score.pprint()
 
         result = final_pos_score.most_common(3)
@@ -220,8 +245,6 @@ class Predict:
 
         #########################################################
 
-    def test(self):
-        pass
 
 # start testing
 if __name__== "__main__":
