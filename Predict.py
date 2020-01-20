@@ -82,55 +82,44 @@ class Predict:
 
         return pos_freq_token
 
-    def ngram_test(self, order):
-        # >>> conduct testing on bigram
-        # >>> conduct testing on trigram
+    def pos_ngram_test(self, order=3):
         # >>> conduct testing on bigram + trigram
         # trigram + brigram
         # testing's starting time
         start_testing = time.time()
+        total = 0
+        correct = 0
 
         for sent in self.ng_models[1].test_sents:
             sentence = " ".join(sent).lower()
             pos_tag_ngram = ngrams(pos_tag(word_tokenize(sentence)), order)
 
             for token_poses in pos_tag_ngram:
-                pos = tuple()
-                for _, p in token_poses:
+                token, pos = tuple(), tuple()
+                for t, p in token_poses:
                     pos += (p,)
-                print(pos)
+                    token += (t,)
+                print("<>"*30)
+                # print("{} -> {} : ".format(token, pos))
+
+                self.update_suggestion(pos[:-1])
+                most_common3 = {fst for fst, snd in self.poses2suggest.most_common(3)}
+
+                verbal_sentence = "Ground Truth : {} -> Suggest : {} : "
+                print(verbal_sentence.format(pos[-1], most_common3))
+                # print(most_common3)
+                total += 1
+                if pos[-1] in most_common3:
+                    correct += 1
+                print(correct/total, total)
         # end of testing
         print("exec time = {}".format(time.time()-start_testing))
 
-    def predict(
-            self,
-            sentence,
-            mc=3,
-        ):
-        start_predicting = time.time()
-
-        #########################################################
-
-        # PREPROCESS
-        sentence = sentence.lower()
-
-        tokenized_words = word_tokenize(sentence)
-        sent_token_pos = pos_tag(tokenized_words[-5:])
-        # print(sent_token_pos)
-
-        sent_tokens = tuple(token for token, _ in sent_token_pos[-2:])
-        sent_poses = tuple(pos for _, pos in sent_token_pos[-2:])
-
+    def update_suggestion(self, sent_poses):
         b_model = self.ng_models[1]
-
-        #########################################################
-
-        # TRY IF THE THE LAST TOKEN EXISTS IN BIGRAM
-        last_token = tuple(sent_tokens[-1:])
-        # print('last token is: ', last_token)
-
-        #########################################################
         epsilon = 0.001
+
+        # initialize poses2suggest data
         self.poses2suggest = FreqDist()
 
         if len(sent_poses) == 1:
@@ -174,11 +163,45 @@ class Predict:
                 if pos_b[-1] not in self.poses2suggest:
                     self.poses2suggest.update({pos_b[-1] : p})
 
+    def sent2sent_token_pos(self, sentence):
+        # PREPROCESS
+        sentence = sentence.lower()
+
+        tokenized_words = word_tokenize(sentence)
+        sent_token_pos = pos_tag(tokenized_words[-5:])
+
+        sent_tokens = tuple(token for token, _ in sent_token_pos[-2:])
+        sent_poses = tuple(pos for _, pos in sent_token_pos[-2:])
+
+        return sent_tokens, sent_poses
+
+    def predict(
+            self,
+            sentence,
+            mc=3,
+        ):
+        start_predicting = time.time()
+        b_model = self.ng_models[1]
+
+        sent_tokens, sent_poses =\
+                self.sent2sent_token_pos(sentence)
+
+        #########################################################
+        # update pos suggestion list
+        self.update_suggestion(sent_poses)
+
+        #########################################################
+
+        # TRY IF THE THE LAST TOKEN EXISTS IN BIGRAM
+        last_token = tuple(sent_tokens[-1:])
+        # print('last token is: ', last_token)
+
         ##########################################################
         ## PRINT
         print_info = "----------< {} >----------"+\
                      "\nwith estimated probability ~ {:.2f}%"
         print("\nYou may try...")
+
 
         # last_token to pos_token = lt2pt
         lt2pt = self.last_token2pos_token((last_token),b_model)
@@ -242,8 +265,6 @@ class Predict:
         print("<>"*20)
         # end of predicting
         print("exec time = {}".format(time.time()-start_predicting))
-
-        #########################################################
 
 
 # start testing
