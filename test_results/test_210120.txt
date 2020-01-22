@@ -1,0 +1,45 @@
+.
+.
+.
+.
+.
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <DT> -> Suggest : {'DT', 'PRP', 'NN'}
+accuracy = 61.19%, total = 22371
+<DT>'s rank = 0, current_ranking_ratio = 3.3515265298824373'
+exec time = 3.1518592834472656
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <JJ> -> Suggest : {'NNS', 'NN', 'JJ'}
+accuracy = 61.19%, total = 22372
+<JJ>'s rank = 1, current_ranking_ratio = 3.3514214196316825'
+exec time = 4.175198793411255
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <NN> -> Suggest : {'NNS', 'NN', 'JJ'}
+accuracy = 61.19%, total = 22373
+<NN>'s rank = 0, current_ranking_ratio = 3.3512716220444285'
+exec time = 3.795400619506836
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <IN> -> Suggest : {',', '.', 'IN'}
+accuracy = 61.20%, total = 22374
+<IN>'s rank = 0, current_ranking_ratio = 3.3511218378475016'
+exec time = 5.0786848068237305
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <DT> -> Suggest : {'DT', 'PRP$', 'NN'}
+accuracy = 61.20%, total = 22375
+<DT>'s rank = 0, current_ranking_ratio = 3.3509720670391063'
+exec time = 4.417635202407837
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <NN> -> Suggest : {'NNS', 'NN', 'JJ'}
+accuracy = 61.20%, total = 22376
+<NN>'s rank = 0, current_ranking_ratio = 3.350822309617447'
+exec time = 4.200188875198364
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <.> -> Suggest : {',', '.', 'IN'}
+accuracy = 61.20%, total = 22377
+<.>'s rank = 2, current_ranking_ratio = 3.3507619430665416'
+exec time = 5.424476623535156
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+# "austen-emma.txt" split_ratio: 90-10
+# Suggest 3 terms
+# Overall Execution Time For
+exec time = 70351.51686501503 ~ 19 hours 32 minutes
