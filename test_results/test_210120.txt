@@ -41,5 +41,5 @@ exec time = 5.424476623535156
 <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
 # "austen-emma.txt" split_ratio: 90-10
 # Suggest 3 terms
-# Overall Execution Time For
+# Overall Execution Time
 exec time = 70351.51686501503 ~ 19 hours 32 minutes
