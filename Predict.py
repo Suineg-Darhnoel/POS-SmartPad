@@ -137,7 +137,7 @@ class Predict:
                 total_rank += curr_rank
                 ranking_ratio = total_rank / total
 
-                verbal_message2 = "<{}>'s rank = {}, current_ranking_ratio = {}'"
+                verbal_message2 = "<{}>'s rank = {}, average_ranking = {}'"
                 print(verbal_message2.format(curr_pos, curr_rank, ranking_ratio))
 
                 gram_e = time.time()

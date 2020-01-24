@@ -1,0 +1,61 @@
+.
+.
+.
+.
+.
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <RB> -> Suggest : {'DT', 'RB', 'VBN', 'PRP'}
+accuracy = 68.77%, total = 22368
+<RB>'s rank = 0, average_ranking = 3.351931330472103'
+exec time = 2.8913466930389404
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <VBN> -> Suggest : {'VB', 'RB', 'VBN', 'JJ'}
+accuracy = 68.77%, total = 22369
+<VBN>'s rank = 1, average_ranking = 3.3518261880280744'
+exec time = 3.5716633796691895
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <IN> -> Suggest : {',', '.', 'IN', 'TO'}
+accuracy = 68.77%, total = 22370
+<IN>'s rank = 0, average_ranking = 3.3516763522574875'
+exec time = 2.906043529510498
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <DT> -> Suggest : {'DT', 'PRP$', 'PRP', 'NN'}
+accuracy = 68.77%, total = 22371
+<DT>'s rank = 0, average_ranking = 3.3515265298824373'
+exec time = 3.149207830429077
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <JJ> -> Suggest : {'NNS', 'RB', 'NN', 'JJ'}
+accuracy = 68.77%, total = 22372
+<JJ>'s rank = 1, average_ranking = 3.3514214196316825'
+exec time = 4.175140142440796
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <NN> -> Suggest : {'NNS', ',', 'NN', 'JJ'}
+accuracy = 68.77%, total = 22373
+<NN>'s rank = 0, average_ranking = 3.3512716220444285'
+exec time = 3.792156457901001
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <IN> -> Suggest : {',', '.', 'IN', ':'}
+accuracy = 68.78%, total = 22374
+<IN>'s rank = 0, average_ranking = 3.3511218378475016'
+exec time = 5.032448768615723
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <DT> -> Suggest : {'DT', 'PRP$', 'PRP', 'NN'}
+accuracy = 68.78%, total = 22375
+<DT>'s rank = 0, average_ranking = 3.3509720670391063'
+exec time = 4.420152902603149
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <NN> -> Suggest : {'NNS', 'RB', 'NN', 'JJ'}
+accuracy = 68.78%, total = 22376
+<NN>'s rank = 0, average_ranking = 3.350822309617447'
+exec time = 4.219919681549072
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+Ground Truth : <.> -> Suggest : {',', '.', 'IN', ':'}
+accuracy = 68.78%, total = 22377
+<.>'s rank = 2, average_ranking = 3.3507619430665416'
+exec time = 5.412211179733276
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+# "austen-emma.txt" split_ratio: 90-10
+# Suggest 4 terms
+# Overall Execution Time
+exec time = 69785.25295972824 ~ 19 hours 23 minutes
+
