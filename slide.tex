@@ -6,12 +6,8 @@
 \usetheme{metropolis}
 
 \title{Word Suggestion Based POS-Ngram}
-\subtitle{A short story}
+\subtitle{Hamana Lab, Gunma University}
 \author{Borann Chanrathnak}
-\institute{
-        Hamana Lab\\
-        Gunma University\\
-}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -37,7 +33,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{What is POS-Ngram?}
+\begin{frame}{What does POS-Ngram mean?}
 \begin{itemize}
     \item \textbf{POS} stands for Part-Of-Speech
         \begin{itemize}
@@ -50,13 +46,52 @@
             \item \textbf{bigram} : (I, study), (study, english) 
             \item \textbf{trigram} : (I, study, english)
         \end{itemize}
-    \item \textbf{Ngram model} is one of statistical langauge models for predicting the next item (word) based on Markov assumption, aslo can be abbreviated as \textbf{Ngram}
+    \item \textbf{Ngram model} is one of statistical langauge models for predicting the next item (word) based on Markov assumption, and usually the model can be abbreviated as \textbf{Ngram}
 \end{itemize}
-
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Ngram}
+\begin{frame}{What does POS-Ngram mean?}
+In this context, \textbf{POS-Ngram} is a model where we apply the concept of \textbf{Ngram} model with part-of-speech of words.
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ngram}
+
+\begin{frame}{Joint Probability}
+How can we compute the joint probability of a sentence?\\
+\textit{Ex:} "an apple is on the" \\
+    $$P(an\ apple\ is\ on\ the) = \text{?}$$
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Chain Rule Of Probability}
+    \begin{block}{Notation}
+        \begin{itemize}
+            \item To represent the probability of a paricular random variable $X_i$ taking on the value "the", or $P(X_i="the")$ we will use simplification $P(the)$.
+            \item We represent a sequence of N words either as $w_1\cdots w_n$ or $w_1^n$
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Chain Rule Of Probability}
+    \begin{block}{In General}
+        $$P(X_1\cdots X_n) = P(X_1)P(X_2|X_1)P(X_3|X_1^2)\cdots P(X_n|X_1^{n-1})$$
+    \end{block}
+    \begin{block}{By applying chain rule to words}
+        $$P(w_1\cdots w_n) = P(w_1)P(w_2|w_1)P(w_3|w_1^2)\cdots P(w_n|w_1^{n-1})$$
+    \end{block}
+
+    \begin{block}{Examples}
+        \begin{itemize}
+            \item $P(an\ apple) = P(an)\times P(apple|an)$
+            \item $P(an\ apple\ is) = P(an)\times P(apple| an) \times P(is | an, apple)$
+        \end{itemize}
+    \end{block}
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
