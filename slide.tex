@@ -1,0 +1,64 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb, amsmath}
+\usepackage{ragged2e}
+\usetheme{metropolis}
+
+\title{Word Suggestion Based POS-Ngram}
+\subtitle{A short story}
+\author{Borann Chanrathnak}
+\institute{
+        Hamana Lab\\
+        Gunma University\\
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Inspiration}
+
+\begin{frame}{Inspiration}
+\begin{enumerate}
+    \item Word suggestion on mobile devices
+    \item Online Digital Writing Tools
+\end{enumerate}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{What is POS-Ngram?}
+\begin{itemize}
+    \item \textbf{POS} stands for Part-Of-Speech
+        \begin{itemize}
+            \item I study english
+            \item (I, Pronoun), (study, Verb), (english, Noun)
+        \end{itemize}
+    \item \textbf{Ngram} is a contiguous sequence of n items from a given sample of text or speech
+        \begin{itemize}
+            \item \textbf{unigram} : (I,), (study,), (english,)
+            \item \textbf{bigram} : (I, study), (study, english) 
+            \item \textbf{trigram} : (I, study, english)
+        \end{itemize}
+    \item \textbf{Ngram model} is one of statistical langauge models for predicting the next item (word) based on Markov assumption, aslo can be abbreviated as \textbf{Ngram}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Ngram}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
