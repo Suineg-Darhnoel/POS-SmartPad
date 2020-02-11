@@ -4,6 +4,7 @@
 \usepackage{amssymb, amsmath}
 \usepackage{ragged2e}
 \usepackage{ulem}
+\usepackage{listings}
 \usetheme{metropolis}
 
 \title{Word Suggestion Based POS-Ngram}
@@ -22,8 +23,6 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Inspiration}
-
 \begin{frame}{Inspiration}
 \begin{enumerate}
     \item Word suggestion on mobile devices
@@ -226,6 +225,7 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{POS-Ngram}
+\subsection{Formula For POS-Ngram}
 \begin{frame}{POS-Ngram}
     \begin{itemize}
         \item \textbf{POS-Ngram} is not much different from Ngram.\\
@@ -237,7 +237,48 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
                 \item \{Noun, Modal Verb\} $\leftarrow$ \{Can, $\cdots$\}
             \end{itemize}
     \end{itemize}
+    Let's see the formula below:
+    $$P(w_n|w_{n-1}) = \sum_{c_n}P(w_n|c_n)\times P(c_n|c_{n-N+1}^{n-1})$$
+    It means if $w_n$ is the next word to be suggested, first we need to compute $P(c_n|c_{n-N+1}^{n-1})$ based on Ngram model we have discussed up until now. Then, we can obtain $P(w_n|c_n)$ by the formula:
+    $$P(w_n|c_n) = \frac{C(w_n,c_n)}{C(c_n)}$$
+
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Programming}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Environment}
+
+\begin{frame}{Implementation is in Python3}
+    \begin{itemize}
+        \item Python became the langauge of choice for its simplicity for manipulating data
+        \item Along with NLTK (Natural Language ToolKit), one of the most powerful NLP libraries, providing many useful tools and resources to work with. This project wouldn't be able to be completed without its existence.
+            \begin{itemize}
+                \item \lstinline{pos_tag} is used to POS of each word in a sequence
+                \item \lstinline{pos_tag(["I", "go", "to"])} $\rightarrow$ \lstinline{[("I", "PRN"), ("go", "Verb"), ("to", "TO")]}
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Programming Structure}
+
+\begin{frame}{Programming Structure}
+    \textbf{PosNgram.py} : Preprocessing data\\
+    \textbf{Predict.py} : Computing probability based on POS-Ngram model\\
+    \textbf{Ui.py} : Providing user interface
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \centering
+    \Huge DEMO
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \centering
+    \Huge Thnak You.
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
