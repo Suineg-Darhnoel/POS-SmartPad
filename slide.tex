@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsmath}
 \usepackage{ragged2e}
+\usepackage{ulem}
 \usetheme{metropolis}
 
 \title{Word Suggestion Based POS-Ngram}
@@ -66,7 +67,7 @@ How can we compute the joint probability of a sentence?\\
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\subsection{Chain Rule of Probability}
 \begin{frame}{Chain Rule Of Probability}
     \begin{block}{Notation}
         \begin{itemize}
@@ -89,10 +90,153 @@ How can we compute the joint probability of a sentence?\\
     \begin{block}{Examples}
         \begin{itemize}
             \item $P(an\ apple) = P(an)\times P(apple|an)$
-            \item $P(an\ apple\ is) = P(an)\times P(apple| an) \times P(is | an, apple)$
+            \item $P(an\ apple\ is) = P(an)\times P(apple| an) \times P(is | an\ apple)$
         \end{itemize}
     \end{block}
 
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{How to compute the probability?}
+By applying chain rule to our first example we obtain:
+    \begin{align*}
+        P(an\ apple\ is\ on\ the) &= P(an)\times P(apple|\ an) \times P(is|\ an\ apple)\\
+                                  &\times P(on|\ an\ apple\ is) \times P(the|\ an\ apple\ is\ on) 
+    \end{align*}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{In practice chain rule does not help}
+    \begin{itemize}
+        \item Although chain rule suggests that we could estimate the joint probability of an entire sequence of words by multiplying together a number of conditional probabilities, it does not seem to help us.
+        \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n|w_n^{n-1})$
+        \item Language is creative, and any particular context might have never occured before
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Markov Assumption}
+
+\begin{frame}{The Presence of Ngram}
+    When we use bigram model (2-gram) to predict the conditional probability of the next word,
+    we can approximate by
+    $$P(w_n|w_1^{n-1}) \approx P(w_n|w_{n-1})$$
+    \textbf{Ex: In case of Bigram (2-gram)} 
+    $$P(the|\ an\ apple\ is\ on) \approx P(the|\ on)$$
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{General Equation for N-gram Approximation}
+    The general equation for this n-gram approximation to the conditional probability of the next word in a sequence is
+    $$P(w_n|w_1^{n-1}) \approx P(w_n|w_{n-N+1}^{n-1})$$
+    \textbf{Ex: In case of Trigram (3-gram)} 
+    $$P(the|\ an\ apple\ is\ on) \approx P(the|\ is\ on)$$
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Maximum Likelihood Estimation}
+\begin{frame}{How to estimate N-gram probabilies?}
+    \begin{itemize}
+        \item Use \textbf{maximum likelihood estimation} or \textbf{MLE}
+        \item Get the MLE estimate for the parameters of an n-gram model by getting counts from a corpus
+        \item \textbf{Normalize} the counts so that they lie between 0 and 1.
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{MLE for the probability of a complete word sequence}
+    Given the bigram assumption for the probability of an individual word, we can compute the probability of complete word sequence by:
+    $$P(w_1^n) \approx \prod_{k=1}^nP(w_k|w_{k-1})$$
+    \textbf{Ex:} We can compute $P(an\ apple\ is\ on\ the)$ as
+    \begin{align*}
+        P(an\ apple\ is\ on\ the) &= P(apple|\ an) \times P(is|\ apple) \times P(on|\ is)\\
+                                  &\times P(on|\ is) \times P(the|\ on)
+    \end{align*}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Normalizing In case of Bigram}
+By supposing that C is the counts of word from a corpus.
+    $$P(w_n|w_{n-1}) = \frac{C(w_{n-1}w_n)}{\sum_{w}C(w_{n-1}w)}$$
+    \textbf{In Words:}\\
+    To estimate the probability that \textit{"the"} appears after \textit{"on"} we count how many times the pair \textit{"on the"} appears in our corpus and how many times \textit{"on"} appears, and divide.\\
+    \textbf{Mathematically:}\\
+    $$P(the|\ on) = \frac{C("on\ the")}{\sum_{others}C("on",others)}$$
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Computing using a corpus}
+    Let's take an example on a mini-courpus of three sentences\\
+    \begin{enumerate}
+        \item $<s>$ I am sam $</s>$
+        \item $<s>$ sam I am $<s>$
+        \item  $<s>$ I do not like green eggs and ham $<s>$
+    \end{enumerate}
+    The calculations for some of the bigram probabilies from the corpus are:
+    \begin{align*}
+        P(I|<s>)=\frac{2}{3},\ P(sam|<s>)=\frac{1}{3},\ P(am|I)=\frac{2}{3}\\
+        P(</s>|sam)=\frac{1}{2},\ P(sam|am)=\frac{1}{2},\ P(do|I)=\frac{1}{3}
+    \end{align*}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{OOV, Smoothing and Interpolation}
+    \textbf{OOV} stands for \textbf{Out Of Vocabulary}\\
+    \begin{itemize}
+        \item OOV problem occurs even when we work on big data.
+        \item Some words appear only in a test set but not in the training set.
+    \end{itemize}
+    To solve the problem we can use either \textbf{Smoothing} or \textbf{Interpolation}.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Types of smoothing}
+    \begin{itemize}
+        \item Laplace smoothing (Add-one smoothing)
+        \item Add-k smoothing
+        \item $\cdots$
+    \end{itemize}
+    \textbf{Ex: }Unsmoothed maximum likelihood estimate of the unigram probability of the word $w_i$ is its count $c_i$ normalized by the total number of word tokens N:\\
+    $$P(w_i)=\frac{c_i}{N}$$
+    Laplace smoothing adds one to each count. Since there are $V$ words in the vocabulary and each one was incremented, we also need to adjust the denominator.\\
+    $$P_{Laplace}=\frac{c_i+1}{N+V}$$
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Interpolation}
+We mix the probability estimates from all the n-gram estimators, weighing and combining the trigram, bigram, and unigram counts.\\
+    \textbf{In case of Trigram}\\
+    To estimate $P(w_n|w_{n-2}w_{n-1})$ we can use simple interpolation as follows:
+    \begin{align*}
+        \hat{P} (w_n|w_{n-2}w_{n-1}) &= \lambda_1P(w_n|w_{n-2}w_{n-1})\\
+                                     &+ \lambda_2P(w_n|w_{n-1})\\
+                                     &+ \lambda_3P(w_n)
+    \end{align*}
+    where we choose $\lambda_i$ such that $\sum_i\lambda_i = 1$
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{How are the $\lambda$ values set?}
+    \begin{itemize}
+        \item They can be learned from a \textbf{held-out} corpus, where held-out corpus is an additional training corpus that we use to set hyperparameters like these $\lambda$ values, by choosing the $\lambda$ values that maximize the likelihood of the held-out corpus.\\
+        \item One way is to use \textbf{EM} algorithm, an iterative learning algorithm that converges on locally $\lambda$ values.
+        \item For the purpose of this project, we merely assign $\lambda_i > \lambda_j$ ($\forall i < j$) since we can assume without loss of generality that Trigram gives more information than Bigram, and Bigram gives more information than Unigram.
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{POS-Ngram}
+\begin{frame}{POS-Ngram}
+    \begin{itemize}
+        \item \textbf{POS-Ngram} is not much different from Ngram.\\
+        \item We consider POS as classes for words.
+            \begin{itemize}
+                \item \{Noun\} $\leftarrow$ \{Cat, Dog, Thought, $\cdots$\}
+                \item \{Verb\} $\leftarrow$ \{Go, Sleep, Think, $\cdots$\}
+                \item \{Noun, Verb\} $\leftarrow$ \{Type, $\cdots$\}
+                \item \{Noun, Modal Verb\} $\leftarrow$ \{Can, $\cdots$\}
+            \end{itemize}
+    \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
