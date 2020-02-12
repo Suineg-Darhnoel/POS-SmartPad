@@ -26,7 +26,7 @@
 \begin{frame}{Inspiration}
 \begin{enumerate}
     \item Word suggestion on mobile devices
-    \item Online Digital Writing Tools
+    \item Online digital writing tools
 \end{enumerate}
 
 \end{frame}
@@ -37,7 +37,7 @@
 \begin{itemize}
     \item \textbf{POS} stands for Part-Of-Speech
         \begin{itemize}
-            \item I study english
+            \item \textbf{Ex :} I study english
             \item (I, Pronoun), (study, Verb), (english, Noun)
         \end{itemize}
     \item \textbf{Ngram} is a contiguous sequence of n items from a given sample of text or speech
@@ -66,7 +66,6 @@ How can we compute the joint probability of a sentence?\\
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Chain Rule of Probability}
 \begin{frame}{Chain Rule Of Probability}
     \begin{block}{Notation}
         \begin{itemize}
@@ -113,7 +112,6 @@ By applying chain rule to our first example we obtain:
     \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Markov Assumption}
 
 \begin{frame}{The Presence of Ngram}
     When we use bigram model (2-gram) to predict the conditional probability of the next word,
@@ -128,11 +126,8 @@ By applying chain rule to our first example we obtain:
 \begin{frame}{General Equation for N-gram Approximation}
     The general equation for this n-gram approximation to the conditional probability of the next word in a sequence is
     $$P(w_n|w_1^{n-1}) \approx P(w_n|w_{n-N+1}^{n-1})$$
-    \textbf{Ex: In case of Trigram (3-gram)} 
-    $$P(the|\ an\ apple\ is\ on) \approx P(the|\ is\ on)$$
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Maximum Likelihood Estimation}
 \begin{frame}{How to estimate N-gram probabilies?}
     \begin{itemize}
         \item Use \textbf{maximum likelihood estimation} or \textbf{MLE}
@@ -225,7 +220,6 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{POS-Ngram}
-\subsection{Formula For POS-Ngram}
 \begin{frame}{POS-Ngram}
     \begin{itemize}
         \item \textbf{POS-Ngram} is not much different from Ngram.\\
@@ -246,7 +240,6 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Programming}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Environment}
 
 \begin{frame}{Implementation is in Python3}
     \begin{itemize}
@@ -259,12 +252,11 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
     \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Programming Structure}
 
 \begin{frame}{Programming Structure}
     \textbf{PosNgram.py} : Preprocessing data\\
     \textbf{Predict.py} : Computing probability based on POS-Ngram model\\
-    \textbf{Ui.py} : Providing user interface
+    \textbf{Ui.py} : Providing user interface\\
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -273,12 +265,60 @@ We mix the probability estimates from all the n-gram estimators, weighing and co
     \Huge DEMO
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Testing}
+    \begin{itemize}
+        \item Corpus : "austen-emma.txt" (available in NLTK)
+        \item Spliting Ratio : 90-10
+    \end{itemize}
+    \textbf{Results}\\
+    \begin{itemize}
+        \item 3 terms $\rightarrow$ , Acc : 61.20\%, Overall Execution Time : \textbf{19 hours 32 minutes}
+        \item 4 terms $\rightarrow$ , Acc : 68.78\%, Overall Execution Time : \textbf{19 hours 32 minutes}
+        \item 5 terms $\rightarrow$ , Acc : 74.59\%, Overall Execution Time : \textbf{19 hours 32 minutes}
+        \item 6 terms $\rightarrow$ , Acc : 79.72\%, Overall Execution Time : \textbf{19 hours 32 minutes}
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+    \textbf{Pros}\\
+    \begin{itemize}
+        \item The model is easy to train (just counting)
+        \item Part-of-speech adds more information
+        \item The training data is sufficient enough to avoid Out-Of-Vocabulary problem
+    \end{itemize}
+    \textbf{Cons}\\
+    \begin{itemize}
+        \item The model is hard to test (time consuming)
+        \item Computing porformance slows down as the training size increases
+        \item The model would suggest only words it has seen from the training set
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Future Works}
+    \begin{itemize}
+        \item Instead of testing, evaluate the model based on \textbf{perplexity}
+        \item Applying \textbf{word2vec} to help the model see the context in a sentence
+        \item Improve UI design
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{References}
+    \begin{enumerate}
+        \item Speech and Language Processing (Chapter 4) (Daniel Jurafsky - Stanford University, 1999)
+        \item N-gram Language Modeling Tutorial (Lecture notes courtesy of Prof. Mari Ostendorf, 2007-06-21)
+        \item Probabilistic Language Model (Chapter 3) (Kenji KITA, University of Tokyo Press, 1999)
+    \end{enumerate}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}
     \centering
-    \Huge Thnak You.
+    \Huge Thank You.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
