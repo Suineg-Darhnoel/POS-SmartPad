@@ -28,7 +28,7 @@ class Notepad:
     __this_scroll_bar = Scrollbar(__this_text_area)
     __file = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, model, **kwargs):
         # set window size
         try:
             self.__this_width = kwargs['width']
@@ -39,6 +39,9 @@ class Notepad:
             self.__this_height = kwargs['height']
         except KeyError:
             pass
+
+        # SET UP MODEL
+        self.model = model
 
         # WINDOW -------------------------------
 
@@ -127,6 +130,9 @@ class Notepad:
         # Add controls (widget)
         self.__this_text_area.grid(sticky=N + E + S + W)
         self.__this_text_area.config(yscrollcommand=self.__this_scroll_bar.set)
+
+        # set default font size
+        self.__this_text_area.config(font=('Time New Roman', 25))
 
         # get fired when encounter
         # one of the delimiters
@@ -238,17 +244,25 @@ class Notepad:
         self.__this_text_area.event_generate('<<Paste>>')
 
     # live word detection
-    __delimiters = [
+    __triggers = [
         ' ', '.', '!', '?', '\n'
     ]
 
+    # call_detection is called whenever key is released
     def call_detection(self, event):
         key_typed = event.char
 
 
-        if key_typed in self.__delimiters:
-            typed_string = self.__this_text_area.get(1.0, END)
-            model.predict(typed_string)
+        if key_typed in self.__triggers:
+            typed_str = self.__this_text_area.get(1.0, END)
+
+            # If space is found then move else cut
+            delim_str = typed_str
+            if key_typed != ' ':
+                delim_str = typed_str[typed_str.rfind(key_typed)+1:]
+
+            # MODEL PREDICTION IS HERE
+            self.model.predict(delim_str)
 
 
     def run(self):
@@ -258,6 +272,6 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    model = Predict("shakespeare-hamlet.txt", t_size=50)
-    notepad = Notepad()
+    model = Predict("austen-emma.txt", t_size=50)
+    notepad = Notepad(model)
     notepad.run()

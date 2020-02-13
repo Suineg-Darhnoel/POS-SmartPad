@@ -1,6 +1,7 @@
 from PosNgram import *
 from PosMapping import poscode2word
 from past.builtins import execfile
+from termcolor import colored
 import math
 import time
 import random
@@ -228,7 +229,11 @@ class Predict:
         ## PRINT
         print_info = "----------< {} >----------"+\
                      "\nwith estimated probability ~ {:.2f}%"
-        print("\nYou may try...")
+        colored_info = colored(
+                        print_info,
+                        attrs=['bold', 'underline']
+                    )
+        print("\nYou may try" + colored('...', attrs=['blink']))
 
         # last_token to pos_token = lt2pt
         lt2pt = self.last_token2pos_token((last_token),b_model)
@@ -255,13 +260,21 @@ class Predict:
         # randomly apply POS to suggest words
 
         if len(result) < 3:
-            print("len(result) < 3")
+            # print("len(result) < 3")
+            # -- OOV ALERT --
+            print(colored(
+                            "-- OOV -> Random Suggest --",
+                            "red",
+                            attrs=['bold', 'blink']
+                        )
+                )
+
             result = self._poses2suggest.most_common(mc)
 
             for pos, _ in result:
 
                 prob_res = self._poses2suggest[pos] * 100
-                print(print_info.format(poscode2word(pos), prob_res))
+                print(colored_info.format(poscode2word(pos), prob_res))
                 words = list(self.ng_models[0].poses2tokens((pos,)))
 
                 words2suggest = random.sample(
@@ -271,14 +284,13 @@ class Predict:
                 words2suggest = [x[0] for x in words2suggest]
                 for word in words2suggest:
                     print(">>> " + word)
-                print(">>> ...")
         else:
             max_word = 3
             for pos, prob in result:
                 suggest_words = lt2pt[pos]
                 sorted_words = sorted(suggest_words)
 
-                print(print_info.format(poscode2word(pos), prob))
+                print(colored_info.format(poscode2word(pos), prob))
                 final_words = []
                 for index in sorted_words:
                     for w in suggest_words[index][:max_word]:
@@ -290,7 +302,6 @@ class Predict:
 
                 for word in words2suggest:
                     print(">>> " + word)
-                print(">>> ...")
 
         print("<>"*20)
         # end of predicting
