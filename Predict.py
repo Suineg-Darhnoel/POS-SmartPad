@@ -25,6 +25,8 @@ class Predict:
 
         self._poses2suggest = FreqDist()
 
+    # This function is used for prior probability calculation
+    # of the sequence of POS obtained from the given sentence
     def prior_probs(self, sentence, model, word_nums=5):
         sentence = sentence.lower()
         sents = word_tokenize(sentence)
@@ -59,7 +61,9 @@ class Predict:
 
         return math.e**log_prob_sum
 
-    def last_token2pos_token(self, last_token, model):
+    # This function is used to suggest the next word
+    # based on bigram
+    def bigram2pos_token(self, last_token, model):
         tmp_data = model.fetch_if(
                 'prefix',
                 last_token,
@@ -87,15 +91,15 @@ class Predict:
 
         return pos_freq_token
 
-    def pos_rank(self, arg):
+    def find_pos_rank(self, arg):
         mst_common = self._poses2suggest.most_common()
         for k, (pos, _) in enumerate(mst_common):
             if arg == pos:
                 return k
         return len(mst_common)
 
+    # conduct testing on bigram + trigram
     def pos_ngram_test(self, sug_nums = 3):
-        # >>> conduct testing on bigram + trigram
         start_testing = time.time()
 
         total_rank = 0
@@ -114,7 +118,6 @@ class Predict:
                     pos += (p,)
                     token += (t,)
                 print("<>"*30)
-                # print("{} -> {} : ".format(token, pos))
 
                 self.update_suggestion(pos[:-1])
                 most_common3 = {
@@ -126,7 +129,6 @@ class Predict:
                 verbal_message1 = "Ground Truth : <{}> -> Suggest : {}"
                 print(verbal_message1.format(curr_pos, most_common3))
 
-                # print(most_common3)
                 total += 1
                 if curr_pos in most_common3:
                     correct += 1
@@ -134,7 +136,7 @@ class Predict:
                 accuracy = 100 * (correct / total)
                 print("accuracy = {:.2f}%, total = {}".format(accuracy, total))
 
-                curr_rank = self.pos_rank(curr_pos)
+                curr_rank = self.find_pos_rank(curr_pos)
                 total_rank += curr_rank
                 ranking_ratio = total_rank / total
 
@@ -157,12 +159,13 @@ class Predict:
             all_poses_freq_in_b = \
                     b_model.fetch_if('prefix', sent_poses[-1:])
             d = all_poses_freq_in_b.N()
+
             for p, freq in all_poses_freq_in_b.items():
                 n = freq
                 self._poses2suggest.update({p[-1]:n/d})
 
         elif len(sent_poses) == 2:
-            # apply bigram & trigram models
+            # APPLY BIGRAM AND TRIGRAM MODEL
             t_model = self.ng_models[2]
             the_pos_suffix = sent_poses[-1:]
 
@@ -188,13 +191,13 @@ class Predict:
                     dt = t_model.fetch_if('prefix', pos_t[:-1]).N()
                     pt = nt / dt
 
-                # interpolation
+                # INTERPOLATION
                 p = 0.2 * pb + 0.8 * pt
                 if pos_b[-1] not in self._poses2suggest:
                     self._poses2suggest.update({pos_b[-1] : p})
 
     def sent2sent_token_pos(self, sentence):
-        # PREPROCESS
+        # lowerify all the character in the given sentence
         sentence = sentence.lower()
 
         tokenized_words = word_tokenize(sentence)
@@ -210,6 +213,17 @@ class Predict:
             sentence,
             mc=3,
         ):
+        #########################################################
+        print_info = "----------< {} >----------"+\
+                     "\nwith estimated probability ~ {:.2f}%"
+        colored_info = colored(
+                        print_info,
+                        attrs=['bold', 'underline']
+                    )
+
+        oov_message = "-- OOV -> Random Suggest --"
+        oov_alert = colored(oov_message, "red",attrs=['bold', 'blink'])
+        #########################################################
         start_predicting = time.time()
         b_model = self.ng_models[1]
 
@@ -226,17 +240,9 @@ class Predict:
         # print('last token is: ', last_token)
 
         ##########################################################
-        ## PRINT
-        print_info = "----------< {} >----------"+\
-                     "\nwith estimated probability ~ {:.2f}%"
-        colored_info = colored(
-                        print_info,
-                        attrs=['bold', 'underline']
-                    )
-        print("\nYou may try" + colored('...', attrs=['blink']))
 
         # last_token to pos_token = lt2pt
-        lt2pt = self.last_token2pos_token((last_token),b_model)
+        lt2pt = self.bigram2pos_token((last_token),b_model)
         total_freqs_lt2pt = 0
         for pos, vals in lt2pt.items():
             total_freqs_lt2pt += sum(vals)
@@ -255,19 +261,18 @@ class Predict:
 
         result = final_pos_score.most_common(3)
 
+        #########################################################
         # 1st: Suggest words from Bigram's dictionary
         # 2nd: If there is no word in the Bigram, just
         # randomly apply POS to suggest words
+        col_msg = colored("\nYou may try", "green", attrs=['bold'])
+        propose_msg = '<>'*20 + col_msg
+        print(propose_msg + colored('...', attrs=['blink']))
 
         if len(result) < 3:
             # print("len(result) < 3")
             # -- OOV ALERT --
-            print(colored(
-                            "-- OOV -> Random Suggest --",
-                            "red",
-                            attrs=['bold', 'blink']
-                        )
-                )
+            print(oov_alert)
 
             result = self._poses2suggest.most_common(mc)
 
