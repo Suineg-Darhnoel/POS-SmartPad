@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess as subp
+import time
 
 if len(sys.argv) < 2:
     filename = "slide.tex"
@@ -16,6 +17,8 @@ subp.run("pdflatex " + filename, shell=True)
 subp.run("xdg-open " + actual_fname + ".pdf", shell=True)
 
 while True:
+    # update every one second
+    time.sleep(1)
     nf = os.path.getmtime(filename)
     if  nf != f:
         subp.run("pdflatex "+ filename, shell=True)
