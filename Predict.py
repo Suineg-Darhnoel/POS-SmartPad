@@ -214,10 +214,11 @@ class Predict:
             mc=3,
         ):
         #########################################################
-        print_info = "----------< {} >----------"+\
-                     "\nwith estimated probability ~ {:.2f}%"
+        print_info = "----------< {} >----------"
+                     # "\nwith estimated probability ~ {:.2f}%"
         colored_info = colored(
                         print_info,
+                        "blue",
                         attrs=['bold', 'underline']
                     )
 
@@ -279,7 +280,7 @@ class Predict:
             for pos, _ in result:
 
                 prob_res = self._poses2suggest[pos] * 100
-                print(colored_info.format(poscode2word(pos), prob_res))
+                print(colored_info.format(poscode2word(pos)))
                 words = list(self.ng_models[0].poses2tokens((pos,)))
 
                 words2suggest = random.sample(
@@ -295,7 +296,7 @@ class Predict:
                 suggest_words = lt2pt[pos]
                 sorted_words = sorted(suggest_words)
 
-                print(colored_info.format(poscode2word(pos), prob))
+                print(colored_info.format(poscode2word(pos)))
                 final_words = []
                 for index in sorted_words:
                     for w in suggest_words[index][:max_word]:
