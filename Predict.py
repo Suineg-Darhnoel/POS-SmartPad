@@ -28,7 +28,7 @@ class Predict:
     # This function is used for prior probability calculation
     # of the sequence of POS obtained from the given sentence
     def prior_probs(self, sentence, model, word_nums=5):
-        sentence = sentence.lower()
+        sentence = sentence
         sents = word_tokenize(sentence)
         sents = sents[-word_nums:]
 
@@ -108,7 +108,7 @@ class Predict:
 
         for sent in self.ng_models[1].test_sents:
 
-            sentence = " ".join(sent).lower()
+            sentence = " ".join(sent)
             pos_tag_ngram = ngrams(pos_tag(word_tokenize(sentence)), 3)
 
             for token_poses in pos_tag_ngram:
@@ -198,7 +198,7 @@ class Predict:
 
     def sent2sent_token_pos(self, sentence):
         # lowerify all the character in the given sentence
-        sentence = sentence.lower()
+        # sentence = sentence.lower()
 
         tokenized_words = word_tokenize(sentence)
         sent_token_pos = pos_tag(tokenized_words[-5:])

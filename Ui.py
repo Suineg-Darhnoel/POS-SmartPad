@@ -274,6 +274,6 @@ class Notepad:
 
 # Run main application
 if __name__ == '__main__':
-    model = Predict("austen-emma.txt", t_size=5)
+    model = Predict("austen-emma.txt", t_size=50)
     notepad = Notepad(model)
     notepad.run()

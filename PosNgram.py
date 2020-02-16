@@ -95,7 +95,7 @@ class PosNgram:
 
             for sent in train_sents:
                 bar.next()
-                self.__sentence = " ".join(sent).lower()
+                self.__sentence = " ".join(sent)
                 self.train_data.update(self._token_pos_pairs)
 
         print('dict_size = {}'.format(self.train_data.B()))
@@ -189,7 +189,7 @@ class PosNgram:
 
     @property
     def _sent2pos_tag(self):
-        sent = self.__sentence.lower()
+        sent = self.__sentence
         tokens = word_tokenize(sent)
         return pos_tag(tokens)
 
