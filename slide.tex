@@ -1,11 +1,9 @@
-\documentclass{beamer}
+\documentclass[handout]{beamer}
 
 \usepackage[utf8]{inputenc}
 \usepackage{amssymb, amsmath}
-\usepackage{ragged2e}
-\usepackage{ulem}
-\usepackage{listings}
 \usepackage{amsthm}
+\usepackage{comment}
 
 \usepackage{graphicx}
 \graphicspath{{./images/}}
@@ -37,10 +35,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Motivation}
 \begin{frame}{Motivation}
-    \begin{enumerate}
+    \begin{itemize}
         \item Word suggestion on mobile devices
-        \item Online digital writing tools
-    \end{enumerate}
+    \end{itemize}
     \centering
     \visible<2->{\includegraphics[width=3cm]{first}}
     \visible<3->{\includegraphics[width=3cm]{second}}
@@ -48,39 +45,38 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{comment}
 \begin{frame}{How to \textcolor[rgb]{0.8,0.2,0}{Predict}?}
     \centering
 
     "I am japanese, so I speak" $\rightarrow$ \visible<2->{"japanese"}
 \end{frame}
+\end{comment}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{POS-Ngram}
+\section{Part Of Speech Ngram (POS-Ngram)}
 \subsection{Definitions}
 
 \begin{frame}{What does POS-Ngram mean?}
-    \begin{definition}{POS (\textbf{Part Of Speech})}
-        one of the classes into which words are divided according to their grammar,
-        such as noun, verb, adjective, etc.
-    \end{definition}
-    \begin{definition}{\textbf{N-gram}}
+    \visible<1->{
+        \textbf{N-gram} 
         is a contiguous sequence of n items from a given sample of text or speech\\
-        \textbf{Ex: } I study english
-        \begin{itemize}
-            \item \textbf{unigram (1-gram)} : (I,), (study,), (english,)
-            \item \textbf{bigram (2-gram)} : (I, study), (study, english) 
-            \item \textbf{trigram (3-gram)} : (I, study, english)
-        \end{itemize}
-    \end{definition}
-\end{frame}
+            \textbf{Ex: } I study english
+            \begin{itemize}
+                \item \textbf{unigram (1-gram)} : (I,), (study,), (english,)
+                \item \textbf{bigram (2-gram)} : (I, study), (study, english) 
+                \item \textbf{trigram (3-gram)} : (I, study, english)
+            \end{itemize}
+    }
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{What does POS-Ngram mean?}
-    \begin{definition}{\textbf{N-gram model}}
+    \visible<2->{
+        \textbf{N-gram model}
         is one of statistical langauge models for predicting the next item (word) based on Markov assumption, and usually abbreviated as N-gram.
-    \end{definition}
-    \begin{definition}{\textbf{POS-Ngram}}
-        is an improved model using part of speech as a class indicator.
-    \end{definition}
+    }
+
+    \visible<3->{
+        \textbf{POS-Ngram}
+            is an improved model using part of speech as a class indicator.
+    }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,13 +131,10 @@ By applying chain rule to the phrase $"an\ apple\ is\ on\ the"$:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{In practice chain rule does not help}
-    \begin{itemize}
-        \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n\mid w_n^{n-1})$
+    \begin{itemize}[<+->]
+        \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n\mid w_1^{n-1})$
         \item Language is creative, and any particular context might have never occured before
     \end{itemize}
-    \begin{block}{Example}
-        $$P(sentences\mid this\ is\ an\ example\ of\ long) = \mathord{?}$$
-    \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -173,17 +166,24 @@ By supposing that C is the counts of word from a corpus.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{The probability of a complete word sequence}
-    Given the \textbf{bigram} assumption for the probability of an individual word, we can compute the probability of complete word sequence by:
+    Given the \textbf{Bigram} assumption for the probability of an individual word, we can compute the probability of complete word sequence by:
     $$P(w_1^n) \approx \prod_{k=1}^nP(w_k\mid w_{k-1})$$
 
-    % Switch Chain Rule to Bigram based Calculation
-
-    \visible<2->{\begin{block}{Example}
+    % Compare Chain Rule with Bigram based Calculation
+    \begin{block}{\only<1>{Chain Rule}\onslide<2>{Bigram Assumption}}
+        % CHAIN RULE BASED CALCULATION
+        \only<1>{
+            \begin{align*}
+            P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an) \times P(is\mid an\ apple)\\
+                                      &\times P(on\mid an\ apple\ is) \times P(the\mid an\ apple\ is\ on) 
+        \end{align*}}
+        % BIGRAM BASED CALCULATION
+        \onslide<2>{
         \begin{align*}
-            P(an\ apple\ is\ on\ the) &= P(apple\mid an) \times P(is\mid apple) \times P(on\mid is)\\
-                                      &\times P(on\mid is) \times P(the\mid on)
-        \end{align*}
-    \end{block}}
+        P("an\ apple\ is\ on\ the") &= P(apple\mid an) \times P(is\mid apple) \\
+                                    &\times P(on\mid is) \times P(the\mid on)
+        \end{align*}}
+    \end{block}
 
 \end{frame}
 
@@ -192,7 +192,7 @@ By supposing that C is the counts of word from a corpus.
 \begin{frame}{OOV \& Smoothing}
     \textbf{OOV} stands for \textbf{Out Of Vocabulary}\\
     \begin{itemize}
-        \item Words appear only in a test set but not in the training set.
+        \item Words appear only in a \textit{test set} but not in the \textit{training set}.
         \item OOV problem occurs even when we work on big data.
     \end{itemize}
 \end{frame}
@@ -212,21 +212,20 @@ By supposing that C is the counts of word from a corpus.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Interpolation}
-    To estimate $P(w_n\mid w_{n-2}w_{n-1})$ we use simple interpolation as follows:
 
-    \visible<2->{\begin{block}{In case of Bigram}
-        $$\hat{P}(w_n\mid w_{n-1}) = \lambda_1P(w_n\mid w_{n-1}) + \lambda_2P(w_n)$$
-    \end{block}}
+    \begin{block}{In case of Bigram}
+        $$\hat{P}(table\mid the) = \lambda_1P(table\mid the) + \lambda_2P(table)$$
+    \end{block}
 
-    \visible<3->{\begin{block}{In case of Trigram}
+    \visible<2->{\begin{block}{In case of Trigram}
         \begin{align*}
-            \hat{P} (w_n\mid w_{n-2}w_{n-1}) &= \lambda_1P(w_n\mid w_{n-2}w_{n-1})\\
-                                         &+ \lambda_2P(w_n\mid w_{n-1})\\
-                                         &+ \lambda_3P(w_n)
+            \hat{P}(table\mid on\ the) &= \lambda_1P(table\mid on\ the)\\
+                                         &+ \lambda_2P(table\mid the)\\
+                                         &+ \lambda_3P(table)
         \end{align*}
     \end{block}}
 
-    \visible<4->{where we choose $\lambda_i$ such that $\sum_i\lambda_i = 1$}
+    \visible<3->{where we choose $\lambda_i$ such that $\sum_i\lambda_i = 1$}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -244,6 +243,8 @@ By supposing that C is the counts of word from a corpus.
 
     \begin{block}{Formula}
         $$P(w_n\mid w_1^{n-1}) = \sum_{c_n}P(w_n\mid c_n)\times P(c_n\mid c_{n-N+1}^{n-1})$$
+        where $c_n$ is a class of $w_n$\\
+        (In this context, $c_n$ is considered a part of speech of the word $w_n$)
     \end{block}
 
     \visible<2->{\begin{block}{Example}
@@ -260,7 +261,7 @@ By supposing that C is the counts of word from a corpus.
     
     \visible<3->{It means that to predict the next word $w_n$
     \begin{enumerate}
-        \item Compute $P(c_n\mid c_{n-N+1}^{n-1}) \sim P(w_n\mid w_{n-N+1}^{n-1})$ 
+        \item Compute $P(c_n\mid c_{n-N+1}^{n-1}) \onslide<4->{\sim P(w_n\mid w_{n-N+1}^{n-1})$}
         \item $P(w_n\mid c_n)=\frac{C(w_n,c_n)}{C(c_n)}$
         \item $w_n^\ast$ is defined by $\argmax_{w_n} P(w_n\mid w_1^{n-1})$
     \end{enumerate}}
@@ -284,16 +285,6 @@ By supposing that C is the counts of word from a corpus.
         \item Ui : Tkinter
         \item NLTK (Natural Language ToolKit)
     \end{itemize}
-    \begin{table}
-        \flushleft
-        \begin{tabular}{|l|l|l|}
-            \hline
-            \textbf{Function} & \textbf{Argument} & \textbf{Result}\\\hline
-            word\_tokenize & "I like english." & ["I", "like", "english", "."]\\\hline
-            pos\_tag & ["I", "like"] & [("I", "PRN"), ("like", "VBP")]\\
-            \hline
-        \end{tabular}
-    \end{table}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -306,7 +297,7 @@ By supposing that C is the counts of word from a corpus.
     \end{enumerate}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\begin{comment}
 \begin{frame}
     \centering
     \Huge DEMO
@@ -318,6 +309,6 @@ By supposing that C is the counts of word from a corpus.
     \centering
     \Huge Thank You.
 \end{frame}
-
+\end{comment}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
