@@ -36,12 +36,12 @@
 \section{Motivation}
 \begin{frame}{Motivation}
     \begin{itemize}
-        \item Word suggestion on mobile devices
+        \item Word suggestion for note-taking app on mobile devices
     \end{itemize}
     \centering
-    \visible<2->{\includegraphics[width=3cm]{first}}
-    \visible<3->{\includegraphics[width=3cm]{second}}
-    \visible<4->{\includegraphics[width=3cm]{third}}
+    \only<1>{\includegraphics[width=5.5cm]{one}}
+    \only<2>{\includegraphics[width=5.5cm]{two}}
+    \only<3>{\includegraphics[width=5.5cm]{three}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,9 +132,21 @@ By applying chain rule to the phrase $"an\ apple\ is\ on\ the"$:
 
 \begin{frame}{In practice chain rule does not help}
     \begin{itemize}[<+->]
-        \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n\mid w_1^{n-1})$
-        \item Language is creative, and any particular context might have never occured before
+        \item Language is creative, and any particular context might have never occured before.
+        \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n\mid w_1^{n-1})$.
     \end{itemize}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \visible<3->{
+    \textbf{Ex:}
+    \begin{align*}
+        P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an) \times P(is\mid an\ apple)\\
+                                  &\times P(on\mid an\ apple\ is) \times 
+                                  \only<3>{P(the\mid an\ apple\ is\ on)}
+                                  \only<4>{\underline{P(the\mid an\ apple\ is\ on)}}
+    \end{align*}}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -161,6 +173,8 @@ By supposing that C is the counts of word from a corpus.
     \visible<2->{\begin{block}{Example}
         $$P(the\mid \ on) = \frac{C(on\ the)}{\sum_{x}C(on\ x)}$$
     \end{block}}
+    \visible<3->{(\textit{on x}) means (on the), (on board), (on time), (on that), $\cdots$}
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -192,7 +206,7 @@ By supposing that C is the counts of word from a corpus.
 \begin{frame}{OOV \& Smoothing}
     \textbf{OOV} stands for \textbf{Out Of Vocabulary}\\
     \begin{itemize}
-        \item Words appear only in a \textit{test set} but not in the \textit{training set}.
+        \item Words appear only in a \textcolor{purple}{test set} but not in the \textcolor{purple}{training set}.
         \item OOV problem occurs even when we work on big data.
     \end{itemize}
 \end{frame}
@@ -202,22 +216,24 @@ By supposing that C is the counts of word from a corpus.
     \begin{itemize}
         \item Laplace smoothing (Add-one smoothing)
         \item Add-k smoothing
-        \item Interpolation
+        \item \only<1>{Interpolation}
+              \onslide<2->{\textcolor{purple}{Interpolation}}
         \item $\cdots$
     \end{itemize}
+    \onslide<3->{
     \begin{block}{Interpolation}
-        We mix the probability estimates from all the n-gram estimators, weighing and combining the trigram, bigram, and unigram counts.
+        We mix the probability estimates from all the n-gram estimators, weighing and combining the trigram, bigram, and unigram counts.}
     \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Interpolation}
 
-    \begin{block}{In case of Bigram}
+    \begin{block}{Bigram + Unigram}
         $$\hat{P}(table\mid the) = \lambda_1P(table\mid the) + \lambda_2P(table)$$
     \end{block}
 
-    \visible<2->{\begin{block}{In case of Trigram}
+    \visible<2->{\begin{block}{Trigram + Bigram + Unigram}
         \begin{align*}
             \hat{P}(table\mid on\ the) &= \lambda_1P(table\mid on\ the)\\
                                          &+ \lambda_2P(table\mid the)\\
@@ -231,8 +247,8 @@ By supposing that C is the counts of word from a corpus.
 
 \begin{frame}{How are the $\lambda$ values set?}
     \begin{itemize}
-        \item They can be learned from a \textbf{held-out} corpus
-        \item Can be found by \textbf{EM} algorithm
+        \item They can be learned from a \textcolor{purple}{held-out} corpus
+        \item Can be found by \textcolor{purple}{EM} algorithm
         \item For the purpose of this project, we assume without loss of generality that $\lambda_i > \lambda_j (\forall i < j)$
     \end{itemize}
 \end{frame}
@@ -261,11 +277,12 @@ By supposing that C is the counts of word from a corpus.
     
     \visible<3->{It means that to predict the next word $w_n$
     \begin{enumerate}
-        \item Compute $P(c_n\mid c_{n-N+1}^{n-1}) \onslide<4->{\sim P(w_n\mid w_{n-N+1}^{n-1})$}
         \item $P(w_n\mid c_n)=\frac{C(w_n,c_n)}{C(c_n)}$
-        \item $w_n^\ast$ is defined by $\argmax_{w_n} P(w_n\mid w_1^{n-1})$
+        \item Compute $P(c_n\mid c_{n-N+1}^{n-1}) \onslide<4->{\sim P(w_n\mid w_{n-N+1}^{n-1})$}
+        \item $w_n^\ast$ is determined by $\argmax_{w_n} P(w_n\mid w_1^{n-1})$
     \end{enumerate}}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{comment}
 \begin{frame}{POS-Ngram}
@@ -315,11 +332,5 @@ By supposing that C is the counts of word from a corpus.
     \Huge DEMO
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{frame}
-    \centering
-    \Huge Thank You.
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
