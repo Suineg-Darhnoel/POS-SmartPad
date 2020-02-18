@@ -1,9 +1,3 @@
 # Abstract
 
-Based on Ngram, one of the language models, we believe 
-that the sequence of consecutive words, provides sufficient 
-statistical information for a machine to learn and predict the future.
-
-Since texts are written in accordence with grammar rules,
-we hope to train data based on part-of-speech ngram (POS-ngram)
-as a filter for improving word suggestion system.
+Ngram is a type of language model for predicting the next item in a sequence. POS-Ngram is an improved model that integrates part-of-speech with the Ngram. In this study, we employ the POS-Ngram model to augment the ability of a word suggestion system to predict not only words but also provide grammatical information.
