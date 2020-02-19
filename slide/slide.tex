@@ -118,7 +118,7 @@
 
     \visible<3->{\begin{block}{Examples}
         \begin{itemize}
-            \item $P(an\ apple) = P(an)\times P(apple\mid an)$
+            %\item $P(an\ apple) = P(an)\times P(apple\mid an)$
             \item $P(an\ apple\ is) = P(an)\times P(apple\mid an) \times P(is\mid an\ apple)$
         \end{itemize}
     \end{block}}
@@ -137,20 +137,9 @@
 
 \begin{frame}{In practice chain rule does not help}
     \begin{itemize}[<+->]
-        \item Language is creative, and any particular context might have never occured before.
+        % \item Language is creative, and any particular context might have never occured before.
         \item We don't know the way to compute the exact probability of a word given a long sequence of preceding words, $P(w_n\mid w_1^{n-1})$.
     \end{itemize}
-
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \visible<3->{
-    \textbf{Ex:}
-    \begin{align*}
-        P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an) \times P(is\mid an\ apple)\\
-                                  &\times P(on\mid an\ apple\ is) \times 
-                                  \only<3>{P(the\mid an\ apple\ is\ on)}
-                                  \only<4>{\underline{P(the\mid an\ apple\ is\ on)}}
-    \end{align*}}
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -172,7 +161,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Bigram in Practice}
-By supposing that C is the counts of word from a corpus.
+By supposing that C is the counts of a sequence of words from a corpus.
     $$P(w_n\mid w_{n-1}) = \frac{C(w_{n-1}w_n)}{\sum_{w\in dict}C(w_{n-1}w)}$$
 
     \visible<2->{\begin{block}{Example}
@@ -189,20 +178,22 @@ By supposing that C is the counts of word from a corpus.
     $$P(w_1^n) \approx \prod_{k=1}^nP(w_k\mid w_{k-1})$$
 
     % Compare Chain Rule with Bigram based Calculation
-    \begin{block}{\only<1>{Chain Rule}\onslide<2>{Bigram Assumption}}
-        % CHAIN RULE BASED CALCULATION
-        \only<1>{
+    \visible<2->{
+        \textbf{Chain Rule}
             \begin{align*}
-            P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an) \times P(is\mid an\ apple)\\
-                                      &\times P(on\mid an\ apple\ is) \times P(the\mid an\ apple\ is\ on) 
-        \end{align*}}
-        % BIGRAM BASED CALCULATION
-        \onslide<2>{
-        \begin{align*}
-        P("an\ apple\ is\ on\ the") &= P(apple\mid an) \times P(is\mid apple) \\
-                                    &\times P(on\mid is) \times P(the\mid on)
-        \end{align*}}
-    \end{block}
+                P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an)
+                                               \times P(is\mid an\ apple)\\
+                                            &\times P(on\mid an\ apple\ is) 
+                                            \times P(the\mid an\ apple\ is\ on) 
+            \end{align*}
+    }
+    \visible<3->{\\
+        \textbf{Bigram Assumption}
+            \begin{align*}
+            P("an\ apple\ is\ on\ the") &= P(apple\mid an) \times P(is\mid apple) \\
+                                        &\times P(on\mid is) \times P(the\mid on)
+            \end{align*}
+    }
 
 \end{frame}
 
@@ -307,14 +298,6 @@ By supposing that C is the counts of word from a corpus.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Programming Structure}
-\begin{frame}{Programming Structure}
-    \smartdiagramset{}
-    \begin{center}
-        \smartdiagram[priority descriptive diagram]{PosNgram.py,Predict.py,Ui.py}
-    \end{center}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Tools}
 \begin{frame}{Implementation}
@@ -323,6 +306,15 @@ By supposing that C is the counts of word from a corpus.
         \item Ui : Tkinter
         \item NLTK (Natural Language ToolKit)
     \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Programming Structure}
+\begin{frame}{Programming Structure}
+    \smartdiagramset{}
+    \begin{center}
+        \smartdiagram[priority descriptive diagram]{PosNgram.py,Predict.py,Ui.py}
+    \end{center}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
