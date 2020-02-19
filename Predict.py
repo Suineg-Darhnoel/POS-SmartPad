@@ -268,6 +268,8 @@ class Predict:
         # randomly apply POS to suggest words
         col_msg = colored("\nYou may try", "green", attrs=['bold'])
         propose_msg = '<>'*20 + col_msg
+
+        arrows = colored(">>> ", "yellow")
         print(propose_msg + colored('...', attrs=['blink']))
 
         if len(result) < 3:
@@ -289,7 +291,7 @@ class Predict:
 
                 words2suggest = [x[0] for x in words2suggest]
                 for word in words2suggest:
-                    print(">>> " + word)
+                    print(arrows + word)
         else:
             max_word = 3
             for pos, prob in result:
@@ -307,7 +309,7 @@ class Predict:
                 )
 
                 for word in words2suggest:
-                    print(">>> " + word)
+                    print(arrows + word)
 
         print("<>"*20)
         # end of predicting
