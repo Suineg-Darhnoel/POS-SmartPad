@@ -1,19 +1,24 @@
+% \documentclass[handout]{beamer}
 \documentclass{beamer}
 
 \usepackage[utf8]{inputenc}
+%%%%%%%%%%%%%%%% math packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{amssymb, amsmath}
 \usepackage{amsthm}
+\usepackage{bm}
 \usepackage{comment}
 
+%%%%%%%%%%%%%%%% to insert images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{graphicx}
 \graphicspath{{./images/}}
 
+%%%%%%%%%%%%%%%% use costum theme %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usetheme{metropolis}
 \setbeamercolor{block title}{bg=red!20}
 
+%%%%%%%%%%%%%%%% to insert diagram %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{smartdiagram}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Declaration for argmax
+%%%%%%%%%%%%%%%%%%%%%% declaration for argmax %%%%%%%%%%%%%%%%%
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
@@ -39,18 +44,18 @@
         \item Word suggestion for note-taking app on mobile devices
     \end{itemize}
     \centering
-    \only<1>{\includegraphics[width=5.5cm]{one}}
-    \only<2>{\includegraphics[width=5.5cm]{two}}
-    \only<3>{\includegraphics[width=5.5cm]{three}}
+    \only<1>{\includegraphics[height=7cm, width=6cm]{one}}
+    \only<2>{\includegraphics[height=7cm, width=6cm]{two}}
+    \only<3>{\includegraphics[height=7cm, width=6cm]{three}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{comment}
-\begin{frame}{How to \textcolor[rgb]{0.8,0.2,0}{Predict}?}
-    \centering
+    \begin{frame}{How to \textcolor[rgb]{0.8,0.2,0}{Predict}?}
+        \centering
 
-    "I am japanese, so I speak" $\rightarrow$ \visible<2->{"japanese"}
-\end{frame}
+        "I am japanese, so I speak" $\rightarrow$ \visible<2->{"japanese"}
+    \end{frame}
 \end{comment}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Part Of Speech Ngram (POS-Ngram)}
@@ -66,7 +71,7 @@
                 \item \textbf{bigram (2-gram)} : (I, study), (study, english) 
                 \item \textbf{trigram (3-gram)} : (I, study, english)
             \end{itemize}
-    }
+        }
 
     \visible<2->{
         \textbf{N-gram model}
@@ -76,15 +81,15 @@
     \visible<3->{
         \textbf{POS-Ngram}
             is an improved model using part of speech as a class indicator.
-    }
+        }
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{N-gram}
 
 \begin{frame}{How To Compute Probability of a Sentence?}
-How can we compute the joint probability of a sentence?\\
-\textit{Ex:} "an apple is on the table" \\
+    How can we compute the joint probability of words in a sentence?\\
+    \textbf{Ex:} "an apple is on the table" \\
     $$P(an\ apple\ is\ on\ the\ table) = \text{?}$$
 
 \end{frame}
@@ -122,7 +127,7 @@ How can we compute the joint probability of a sentence?\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Let's Apply Chain Rule}
-By applying chain rule to the phrase $"an\ apple\ is\ on\ the"$:
+    By applying chain rule to the phrase $"an\ apple\ is\ on\ the"$:
     \begin{align*}
         P("an\ apple\ is\ on\ the") &= P(an)\times P(apple\mid an) \times P(is\mid an\ apple)\\
                                   &\times P(on\mid an\ apple\ is) \times P(the\mid an\ apple\ is\ on) 
@@ -216,24 +221,27 @@ By supposing that C is the counts of word from a corpus.
     \begin{itemize}
         \item Laplace smoothing (Add-one smoothing)
         \item Add-k smoothing
-        \item \only<1>{Interpolation}
-              \onslide<2->{\textcolor{purple}{Interpolation}}
+        \item Back-off
+        \item \only<1>{Linear interpolation}
+              \onslide<2->{\textcolor{purple}{Linear interpolation}}
         \item $\cdots$
     \end{itemize}
-    \onslide<3->{
-    \begin{block}{Interpolation}
-        We mix the probability estimates from all the n-gram estimators, weighing and combining the trigram, bigram, and unigram counts.}
-    \end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Interpolation}
+\begin{frame}{Linear Interpolation}
 
+    \visible<1->{
+    We mix the probability estimates from all the n-gram estimators, weighing and combining the trigram, bigram, and unigram counts.
+    }
+
+    \visible<2->{
     \begin{block}{Bigram + Unigram}
         $$\hat{P}(table\mid the) = \lambda_1P(table\mid the) + \lambda_2P(table)$$
     \end{block}
+    }
 
-    \visible<2->{\begin{block}{Trigram + Bigram + Unigram}
+    \visible<3->{\begin{block}{Trigram + Bigram + Unigram}
         \begin{align*}
             \hat{P}(table\mid on\ the) &= \lambda_1P(table\mid on\ the)\\
                                          &+ \lambda_2P(table\mid the)\\
@@ -241,14 +249,14 @@ By supposing that C is the counts of word from a corpus.
         \end{align*}
     \end{block}}
 
-    \visible<3->{where we choose $\lambda_i$ such that $\sum_i\lambda_i = 1$}
+    \visible<4->{where we choose $\lambda_i$ such that $\sum_i\lambda_i = 1$}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{How are the $\lambda$ values set?}
     \begin{itemize}
         \item They can be learned from a \textcolor{purple}{held-out} corpus
-        \item Can be found by \textcolor{purple}{EM} algorithm
+        \item Can be found by \href{https://www.cs.cmu.edu/~roni/11761/Presentations/degenerateEM.pdf}{\textcolor{purple}{EM}} algorithm.
         \item For the purpose of this project, we assume without loss of generality that $\lambda_i > \lambda_j (\forall i < j)$
     \end{itemize}
 \end{frame}
@@ -267,9 +275,9 @@ By supposing that C is the counts of word from a corpus.
         \centering
         \begin{tabular}{|l|l|}
             \hline
-            $c_1$:Noun & cat, dog, thought, $\cdots$\\\hline
-            $c_2$:Verb & go, speak, $\cdots$\\\hline
-            $c_1$:Noun, $c_2$:Verb & play, $\cdots$\\\hline
+            cat, dog, thought, $\cdots$ & $c_1$:Noun\\\hline
+            go, speak, $\cdots$         & $c_2$:Verb \\\hline
+            play, $\cdots$              & $c_1$:Noun, $c_2$:Verb\\\hline
         \end{tabular}\\
     \end{block}}
 
@@ -320,11 +328,16 @@ By supposing that C is the counts of word from a corpus.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{References}
-    \begin{enumerate}
-        \item Speech and Language Processing (Chapter 4) (Daniel Jurafsky - Stanford University, 1999)
-        \item N-gram Language Modeling Tutorial (Lecture notes courtesy of Prof. Mari Ostendorf, 2007-06-21)
-        \item Probabilistic Language Model (Chapter 3) (Kenji KITA, University of Tokyo Press, 1999)
-    \end{enumerate}
+    \begin{thebibliography}{4}
+        \bibitem{Stanford}
+            Speech and Language Processing (Chapter 3) (Daniel Jurafsky - Stanford University, 1999)
+            % \url{https://web.stanford.edu/~jurafsky/slp3/edbook_oct162019.pdf}
+        \bibitem{Lecture Note}
+            N-gram Language Modeling Tutorial (Lecture notes courtesy of Prof. Mari Ostendorf, 2007-06-21)\\
+            % \url{http://ssli.ee.washington.edu/WS07/notes/ngrams.pdf}
+        \bibitem{The University of Tokyo}
+            Probabilistic Language Model (Chapter 3) (Kenji KITA, University of Tokyo Press, 1999)
+    \end{thebibliography}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
@@ -333,4 +346,6 @@ By supposing that C is the counts of word from a corpus.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% lecture video
+% https://scs.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c1e90862-bf43-430f-a7cf-0410081ad95d
 \end{document}
