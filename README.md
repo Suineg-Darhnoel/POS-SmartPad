@@ -8,7 +8,7 @@ In this project, I developed a prototyped UI application for text typing in Engl
 
 # Demo
 
-- You need to install `python3` with its dependencies which can be found in [requirements.txt](https://github.com/Suineg-Darhnoel/Prototypes/blob/master/slide/fslide.pdf)
+- You need to install `python3` with its dependencies which can be found in [requirements.txt](https://github.com/Suineg-Darhnoel/Prototypes/blob/master/requirements.txt)
 - the execute command `python3 Ui.py` to see how it works.
 - Then you will see :
 
