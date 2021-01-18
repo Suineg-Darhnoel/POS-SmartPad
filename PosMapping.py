@@ -41,5 +41,6 @@ def poscode2word(pos):
         return tag_des[pos]
     return pos
 
+
 if __name__ == "__main__":
     print(poscode2word('NN'))
