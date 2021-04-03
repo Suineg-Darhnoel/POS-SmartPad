@@ -16,3 +16,4 @@ In this project, I developed a prototyped UI application for text typing in Engl
 
 <img src="images\ui.png" alt="alt text" style="zoom:100%;" />
 
+<img src="images\ui-result.png" alt="alt text" style="zoom:100%;" />
