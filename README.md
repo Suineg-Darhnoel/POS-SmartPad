@@ -9,16 +9,10 @@ In this project, I developed a prototyped UI application for text typing in Engl
 # Demo
 
 - You need to install `python3` with its dependencies which can be found in [requirements.txt](https://github.com/Suineg-Darhnoel/Prototypes/blob/master/requirements.txt)
-- the execute command `python3 Ui.py` to see how it works.
+- the execute command `python3 main.py` to see how it works.
 - Then you will see :
 
-<img src="images/austen-emma.PNG" alt="alt text" title="austen" style="zoom:100%;" />
+<img src="images/cmd.png" alt="alt text" title="austen" style="zoom:100%;" />
 
-<img src="images\UI.PNG" alt="alt text" style="zoom:100%;" />
-
-- To use the application, just type any words in to the white box.
-- Let's see an example: `I go to` then you may see something  *similar* to the below interface.
-- I mentioned *similar* because the result may vary due to the random selection of the program.
-
-![alt text](images/result.PNG "result")
+<img src="images\ui.png" alt="alt text" style="zoom:100%;" />
 

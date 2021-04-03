@@ -1,5 +1,5 @@
-from PosNgram import *
-from PosMapping import poscode2word
+from pos_ngram import *
+from pos_mapping import poscode2word
 from past.builtins import execfile
 from termcolor import colored
 import math
@@ -13,7 +13,8 @@ class Predict:
             self,
             context,
             model_nums=3,
-            t_size=90
+            t_size=50,
+            mc=3
         ):
         assert model_nums >= 2
         self.ng_models = [
@@ -24,6 +25,8 @@ class Predict:
             model.pre_process(context, training_size=t_size)
 
         self._poses2suggest = FreqDist()
+        self.max_word = mc
+        self.is_using_console = True
 
     # This function is used for prior probability calculation
     # of the sequence of POS obtained from the given sentence
@@ -48,7 +51,7 @@ class Predict:
             if d == 0 or n == 0:
                 log_probs.append(-10**10)
                 continue
-            print(pos, n/d)
+            # print(pos, n/d)
             log_probs.append(math.log(n/d))
 
         # sum of log is log of multiplication
@@ -117,7 +120,6 @@ class Predict:
                 for t, p in token_poses:
                     pos += (p,)
                     token += (t,)
-                print("<>"*30)
 
                 self.update_suggestion(pos[:-1])
                 most_common3 = {
@@ -127,26 +129,29 @@ class Predict:
 
                 curr_pos = pos[-1]
                 verbal_message1 = "Ground Truth : <{}> -> Suggest : {}"
-                print(verbal_message1.format(curr_pos, most_common3))
 
                 total += 1
                 if curr_pos in most_common3:
                     correct += 1
 
                 accuracy = 100 * (correct / total)
-                print("accuracy = {:.2f}%, total = {}".format(accuracy, total))
 
                 curr_rank = self.find_pos_rank(curr_pos)
                 total_rank += curr_rank
                 ranking_ratio = total_rank / total
 
                 verbal_message2 = "<{}>'s rank = {}, average_ranking = {}'"
-                print(verbal_message2.format(curr_pos, curr_rank, ranking_ratio))
 
                 gram_e = time.time()
-                print("exec time = {}".format(gram_e - gram_s))
+                if self.is_using_console:
+                    print("<>"*30)
+                    print(verbal_message1.format(curr_pos, most_common3))
+                    print("accuracy = {:.2f}%, total = {}".format(accuracy, total))
+                    print(verbal_message2.format(curr_pos, curr_rank, ranking_ratio))
+                    print("exec time = {}".format(gram_e - gram_s))
         # end of testing
-        print("exec time = {}".format(time.time()-start_testing))
+        if self.is_using_console:
+            print("exec time = {}".format(time.time()-start_testing))
 
     def update_suggestion(self, sent_poses):
         b_model = self.ng_models[1]
@@ -208,11 +213,16 @@ class Predict:
 
         return sent_tokens, sent_poses
 
+    def disable_console(self):
+        self.is_using_console = False
+
     def predict(
             self,
             sentence,
-            mc=3,
+            mc=None,
         ):
+        if mc != None:
+            mc = self.max_word
         #########################################################
         print_info = "----------< {} >----------"
                      # "\nwith estimated probability ~ {:.2f}%"
@@ -258,7 +268,6 @@ class Predict:
                 else:
                     res = sum(lt2pt[pos])/total_freqs_lt2pt
                     final_pos_score.update({pos: 100 * prob * res})
-        # final_pos_score.pprint()
 
         result = final_pos_score.most_common(3)
 
@@ -270,35 +279,25 @@ class Predict:
         propose_msg = '<>'*20 + col_msg
 
         arrows = colored(">>> ", "yellow")
-        print(propose_msg + colored('...', attrs=['blink']))
+        if self.is_using_console:
+            print(propose_msg + colored('...', attrs=['blink']))
 
+        word_lists = []
         if len(result) < 3:
             # print("len(result) < 3")
             # -- OOV ALERT --
-            print(oov_alert)
+            if self.is_using_console:
+                print(oov_alert)
 
-            result = self._poses2suggest.most_common(mc)
-
-            for pos, _ in result:
-
-                prob_res = self._poses2suggest[pos] * 100
-                print(colored_info.format(poscode2word(pos)))
-                words = list(self.ng_models[0].poses2tokens((pos,)))
-
-                words2suggest = random.sample(
-                    words, min(len(words), 4)
-                )
-
-                words2suggest = [x[0] for x in words2suggest]
-                for word in words2suggest:
-                    print(arrows + word)
         else:
-            max_word = 3
+            max_word = mc
             for pos, prob in result:
                 suggest_words = lt2pt[pos]
                 sorted_words = sorted(suggest_words)
 
-                print(colored_info.format(poscode2word(pos)))
+                decoded_pos = poscode2word(pos)
+                if self.is_using_console:
+                    print(colored_info.format(decoded_pos))
                 final_words = []
                 for index in sorted_words:
                     for w in suggest_words[index][:max_word]:
@@ -308,12 +307,16 @@ class Predict:
                     final_words, min(len(final_words), 4)
                 )
 
-                for word in words2suggest:
-                    print(arrows + word)
+                word_lists.append((decoded_pos, words2suggest))
+                if self.is_using_console:
+                    for word in words2suggest:
+                        print(arrows + word)
+        return word_lists
 
-        print("<>"*20)
-        # end of predicting
-        print("exec time = {}".format(time.time()-start_predicting))
+        if self.is_using_console:
+            print("<>"*20)
+            # end of predicting
+            print("exec time = {}".format(time.time()-start_predicting))
 
 
 # start testing
