@@ -102,7 +102,7 @@ class Predict:
         return len(mst_common)
 
     # conduct testing on bigram + trigram
-    def pos_ngram_test(self, sug_nums = 3):
+    def pos_ngram_test(self, sug_nums=3):
         start_testing = time.time()
 
         total_rank = 0
@@ -154,6 +154,11 @@ class Predict:
             print("exec time = {}".format(time.time()-start_testing))
 
     def update_suggestion(self, sent_poses):
+        """
+        Here we combine bigram with trigram model
+        if the query word does not exist in trigram
+        we use bigram
+        """
         b_model = self.ng_models[1]
 
         # initialize _poses2suggest data
@@ -202,9 +207,6 @@ class Predict:
                     self._poses2suggest.update({pos_b[-1] : p})
 
     def sent2sent_token_pos(self, sentence):
-        # lowerify all the character in the given sentence
-        # sentence = sentence.lower()
-
         tokenized_words = word_tokenize(sentence)
         sent_token_pos = pos_tag(tokenized_words[-5:])
 
@@ -221,11 +223,11 @@ class Predict:
             sentence,
             mc=None,
         ):
-        if mc != None:
+        if mc == None:
             mc = self.max_word
-        #########################################################
+
+        ########### CONSOLDE MESSAGE VARIABLES ##################
         print_info = "----------< {} >----------"
-                     # "\nwith estimated probability ~ {:.2f}%"
         colored_info = colored(
                         print_info,
                         "blue",
@@ -233,34 +235,30 @@ class Predict:
                     )
 
         oov_message = "-- OOV -> Random Suggest --"
-        oov_alert = colored(oov_message, "red",attrs=['bold', 'blink'])
+        oov_alert = colored(oov_message, "red", attrs=['bold', 'blink'])
+
+        col_msg = colored("\nYou may try", "green", attrs=['bold'])
+        propose_msg = '<>'*20 + col_msg
+
+        arrows = colored(">>> ", "yellow")
         #########################################################
-        start_predicting = time.time()
         b_model = self.ng_models[1]
+        sent_tokens, sent_poses = self.sent2sent_token_pos(sentence)
 
-        sent_tokens, sent_poses =\
-                self.sent2sent_token_pos(sentence)
-
-        #########################################################
-        # update pos suggestion list
-        self.update_suggestion(sent_poses)
-
-        #########################################################
-        # TRY IF THE THE LAST TOKEN EXISTS IN BIGRAM
         last_token = tuple(sent_tokens[-1:])
-        # print('last token is: ', last_token)
+        self.update_suggestion(sent_poses) # update pos suggestion list
 
-        ##########################################################
-
-        # last_token to pos_token = lt2pt
-        lt2pt = self.bigram2pos_token((last_token),b_model)
+        """
+        computation
+        """
         total_freqs_lt2pt = 0
+        final_pos_score = FreqDist()
+        lt2pt = self.bigram2pos_token((last_token), b_model)
+
+        start_predicting = time.time()
         for pos, vals in lt2pt.items():
             total_freqs_lt2pt += sum(vals)
 
-        # print(total_freqs_lt2pt)
-
-        final_pos_score = FreqDist()
         if lt2pt:
             for pos, prob in self._poses2suggest.items():
                 if pos not in lt2pt:
@@ -269,25 +267,32 @@ class Predict:
                     res = sum(lt2pt[pos])/total_freqs_lt2pt
                     final_pos_score.update({pos: 100 * prob * res})
 
-        result = final_pos_score.most_common(3)
+        result = final_pos_score.most_common(mc)
 
-        #########################################################
-        # 1st: Suggest words from Bigram's dictionary
-        # 2nd: If there is no word in the Bigram, just
-        # randomly apply POS to suggest words
-        col_msg = colored("\nYou may try", "green", attrs=['bold'])
-        propose_msg = '<>'*20 + col_msg
+        """
+        - 1st: Suggest words from Bigram's dictionary
+        - 2nd: If there is no word in the Bigram, just
+        randomly apply POS to suggest words
+        """
 
-        arrows = colored(">>> ", "yellow")
         if self.is_using_console:
             print(propose_msg + colored('...', attrs=['blink']))
 
         word_lists = []
         if len(result) < 3:
-            # print("len(result) < 3")
-            # -- OOV ALERT --
             if self.is_using_console:
                 print(oov_alert)
+            result = self._poses2suggest.most_common(mc)
+            for pos, _ in result:
+                decoded_pos = poscode2word(pos)
+                prob_res = self._poses2suggest[pos] * 100
+                if self.is_using_console:
+                    print(colored_info.format(poscode2word(pos)))
+
+                words = list(self.ng_models[0].poses2tokens((pos,)))
+                words2suggest = random.sample(words, min(len(words), 4))
+
+                word_lists.append((decoded_pos, words2suggest))
 
         else:
             max_word = mc
@@ -315,10 +320,8 @@ class Predict:
 
         if self.is_using_console:
             print("<>"*20)
-            # end of predicting
             print("exec time = {}".format(time.time()-start_predicting))
 
 
-# start testing
 if __name__== "__main__":
     pass

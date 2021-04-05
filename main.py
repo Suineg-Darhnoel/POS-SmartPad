@@ -9,11 +9,25 @@ from tkinter.messagebox import *
 from tkinter.filedialog import *
 from past.builtins import execfile
 from predict import *
-
+import threading
 
 class Notepad:
 
     def __init__(self, model, **kwargs):
+        # set window size
+        try:
+            self.width = kwargs['width']
+        except KeyError:
+            pass
+
+        try:
+            self.height = kwargs['height']
+        except KeyError:
+            pass
+
+        # SET UP MODEL
+        self.model = model
+
         # TKINTER ROOT ---------------
         self.root = Tk()
         # default window width and height
@@ -24,6 +38,7 @@ class Notepad:
 
         # init result frame
         self.result_box = Listbox(self.root)
+
 
         # MENU BAR
         self.menu_bar = Menu(self.root)
@@ -41,20 +56,6 @@ class Notepad:
         # To add scrollbar
         self.scroll_bar = Scrollbar(self.text_area)
         self.file = None
-
-        # set window size
-        try:
-            self.width = kwargs['width']
-        except KeyError:
-            pass
-
-        try:
-            self.height = kwargs['height']
-        except KeyError:
-            pass
-
-        # SET UP MODEL
-        self.model = model
 
         # WINDOW ---------------------
 
@@ -133,7 +134,7 @@ class Notepad:
         # To predict
         self.menu_bar.add_command(
                 label='Predict',
-                command=self.call_detection,
+                command=self.prediction_callback,
                 )
 
         self.menu_bar.config(background='#6e9a44', foreground='white')
@@ -165,6 +166,7 @@ class Notepad:
         self.text_area.configure(bg='black', fg='white', insertbackground='white')
 
         txt_area_binding_list = [
+                    ("<KeyRelease-space>", self.realtime_prediction),
                     ("<Control-Key-n>", self.newFile),
                     ("<Control-Key-o>", self.openFile),
                     ("<Control-Key-q>", self.quitApplication),
@@ -265,19 +267,23 @@ class Notepad:
                         )
                 )
 
-    # call_detection is called whenever key is released
-    def call_detection(self):
+    # prediction_callback is called whenever key is released
+    def prediction_callback(self):
         curr_text = self.text_area.get(1.0, END);
         predict_result = model.predict(curr_text)
-        self.result_box.delete(0, END);
 
         try:
-            for i, (part_of_speech, words) in enumerate(predict_result):
+            self.result_box.delete(0, END);
+            for part_of_speech, words in predict_result:
                 tmp_text = "[ {} ]: {}".format(part_of_speech, ",".join(words))
-                self.result_box.insert(i+1, tmp_text)
+                self.result_box.insert("end", tmp_text)
         except TypeError:
             pass
 
+    # realtime prediction
+    def realtime_prediction(self, event=None):
+        t = threading.Thread(target=self.prediction_callback)
+        t.start()
 
     def run(self):
         # Run main application
