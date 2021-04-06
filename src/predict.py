@@ -26,7 +26,7 @@ class Predict:
 
         self._poses2suggest = FreqDist()
         self.max_word = mc
-        self.is_using_console = True
+        self.is_using_console = False
 
     # This function is used for prior probability calculation
     # of the sequence of POS obtained from the given sentence
@@ -215,8 +215,8 @@ class Predict:
 
         return sent_tokens, sent_poses
 
-    def disable_console(self):
-        self.is_using_console = False
+    def set_using_console(self, enable=True):
+        self.is_using_console = enable
 
     def predict(
             self,
