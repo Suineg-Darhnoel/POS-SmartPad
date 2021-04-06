@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from notepad import *
-from predict import *
+from pos_notepad import *
+from pos_predict import *
 
 # Run main application
 if __name__ == '__main__':

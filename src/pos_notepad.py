@@ -7,7 +7,7 @@ from tkinter.messagebox import *
 from tkinter.filedialog import *
 from past.builtins import execfile
 
-from predict import *
+from pos_predict import *
 import threading
 
 
