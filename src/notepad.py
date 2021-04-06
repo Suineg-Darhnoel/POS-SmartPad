@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import tkinter
 import re
 import os
@@ -8,8 +6,10 @@ from tkinter import *
 from tkinter.messagebox import *
 from tkinter.filedialog import *
 from past.builtins import execfile
+
 from predict import *
 import threading
+
 
 class Notepad:
 
@@ -61,7 +61,7 @@ class Notepad:
 
         # Set the window text
         self.root.title(self.title)
-        self.img = PhotoImage(file='images/smart-pad-logo.png')
+        self.img = PhotoImage(file='../images/smart-pad-logo.png')
         self.root.iconphoto(False, self.img)
 
 
@@ -270,7 +270,7 @@ class Notepad:
     # prediction_callback is called whenever key is released
     def prediction_callback(self):
         curr_text = self.text_area.get(1.0, END);
-        predict_result = model.predict(curr_text)
+        predict_result = self.model.predict(curr_text)
 
         try:
             self.result_box.delete(0, END);
@@ -290,10 +290,3 @@ class Notepad:
         self.root.mainloop()
 
 
-# Run main application
-if __name__ == '__main__':
-    model = Predict("chesterton-brown.txt", t_size=50, mc=5)
-    model.disable_console() # skip printing to console
-
-    notepad = Notepad(model)
-    notepad.run()
